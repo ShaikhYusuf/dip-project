@@ -9,6 +9,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { GetDataService } from '../get-data.service';
 import { VoiceService } from '../voice.service';
+import { IShortQuestionSet } from '../app.model';
 
 
 @Component({
@@ -20,7 +21,7 @@ import { VoiceService } from '../voice.service';
 })
 export class LessonShortQuestionComponent implements OnInit {
   voice: SpeechSynthesisVoice | null = null;
-  sqSet: any;
+  sqSet!: IShortQuestionSet;
   currentIndex = 0;
   userAnswer: string = '';
   history: { question: string, answer: string, userAnswer: string }[] = [];
@@ -35,7 +36,7 @@ export class LessonShortQuestionComponent implements OnInit {
   ngOnInit() {
     const path = this.route.snapshot.queryParams['path'];
     this.voiceService.selectedVoice$.subscribe(v => this.voice = v);
-    this.sqService.getLessonShortQuestions(path).subscribe(data => {
+    this.sqService.getLessonShortQuestions(path).subscribe((data: IShortQuestionSet) => {
       this.sqSet = data;
       this.readCurrentQuestion();
       this.history = []; // Clear history when loading new lesson

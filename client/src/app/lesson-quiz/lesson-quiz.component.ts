@@ -8,6 +8,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { GetDataService } from '../get-data.service';
 import { VoiceService } from '../voice.service';
+import { IQuizSet } from '../app.model';
 
 
 @Component({
@@ -19,7 +20,7 @@ import { VoiceService } from '../voice.service';
 })
 export class LessonQuizComponent implements OnInit {
   voice: SpeechSynthesisVoice | null = null;
-  quizSet: any;
+  quizSet!: IQuizSet ;
   currentIndex = 0;
   selectedOption: string = '';
   history: { question: string, selected: string, answer: string, isCorrect: boolean }[] = [];
@@ -34,7 +35,7 @@ export class LessonQuizComponent implements OnInit {
   ngOnInit() {
     const path = this.route.snapshot.queryParams['path'];
     this.voiceService.selectedVoice$.subscribe(v => this.voice = v);
-    this.quizService.getLessonQuiz(path).subscribe(data => {
+    this.quizService.getLessonQuiz(path).subscribe((data: IQuizSet) => {
       this.quizSet = data;
       this.readCurrentQuestion();
       this.history = []; // Clear history when loading new lesson

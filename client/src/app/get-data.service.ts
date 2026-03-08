@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { ILessonContent, IQuizSet, IShortQuestionSet, ITrueFalseSet } from './app.model';
 
 @Injectable({
   providedIn: 'root'
@@ -11,19 +12,19 @@ export class GetDataService {
 
   constructor(private http: HttpClient) {}
 
-  getLessonContent(path: string): Observable<any> {
-    return this.http.get(`${this.baseUrl}/lesson`, { params: { path } });
+  getLessonContent(path: string): Observable<ILessonContent> {
+    return this.http.get<ILessonContent>(`${this.baseUrl}/lesson`, { params: { path } });
   }
 
-  getLessonQuiz(path: string): Observable<any> {
-    return this.http.get(`${this.baseUrl}/quizzes`, { params: { path } });
+  getLessonQuiz(path: string): Observable<IQuizSet> {
+    return this.http.get<IQuizSet>(`${this.baseUrl}/quizzes`, { params: { path } });
   }
 
-  getLessonTrueFalse(path: string): Observable<any> {
-    return this.http.get(`${this.baseUrl}/truefalses`, { params: { path } });
+  getLessonTrueFalse(path: string): Observable<ITrueFalseSet> {
+    return this.http.get<ITrueFalseSet>(`${this.baseUrl}/truefalses`, { params: { path } });
   }
 
-  getLessonShortQuestions(path: string): Observable<any> {
-    return this.http.get(`${this.baseUrl}/shortquestions`, { params: { path } });
+  getLessonShortQuestions(path: string): Observable<IShortQuestionSet> {
+    return this.http.get<IShortQuestionSet>(`${this.baseUrl}/shortquestions`, { params: { path } });
   }
 }

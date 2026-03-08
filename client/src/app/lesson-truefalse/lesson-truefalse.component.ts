@@ -8,6 +8,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { GetDataService } from '../get-data.service';
 import { VoiceService } from '../voice.service';
+import { ITrueFalseSet } from '../app.model';
 
 
 @Component({
@@ -19,7 +20,7 @@ import { VoiceService } from '../voice.service';
 })
 export class LessonTrueFalseComponent implements OnInit {
   voice: SpeechSynthesisVoice | null = null;
-  tfSet: any;
+  tfSet!: ITrueFalseSet;
   currentIndex = 0;
   selectedOption: string = '';
   history: { question: string, selected: string, isCorrect: boolean }[] = [];
@@ -34,7 +35,7 @@ export class LessonTrueFalseComponent implements OnInit {
   ngOnInit() {
     const path = this.route.snapshot.queryParams['path'];
     this.voiceService.selectedVoice$.subscribe(v => this.voice = v);
-    this.tfService.getLessonTrueFalse(path).subscribe(data => {
+    this.tfService.getLessonTrueFalse(path).subscribe((data: ITrueFalseSet) => {
       this.tfSet = data;
       this.readCurrentQuestion();
       this.history = []; // Clear history when loading new lesson

@@ -4,6 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { GetDataService } from '../get-data.service';
 import { VoiceService } from '../voice.service';
+import { ILessonContent } from '../app.model';
 
 @Component({
   selector: 'app-lesson-content',
@@ -12,8 +13,9 @@ import { VoiceService } from '../voice.service';
   templateUrl: './lesson-content.component.html'
 })
 export class LessonContentComponent implements OnInit {
-  content: any;
   voice: SpeechSynthesisVoice | null = null;
+  content!: ILessonContent ;
+  
 
   constructor(
     private router: Router,
@@ -25,7 +27,7 @@ export class LessonContentComponent implements OnInit {
   ngOnInit() {
     this.voiceService.selectedVoice$.subscribe(v => this.voice = v);
     const path = this.route.snapshot.queryParams['path'];
-    this.getDataService.getLessonContent(path).subscribe(data => {
+    this.getDataService.getLessonContent(path).subscribe((data: ILessonContent) => {
       this.content = data;
       this.readContent();
     });
@@ -34,7 +36,7 @@ export class LessonContentComponent implements OnInit {
   readContent() {
     if (!this.voice || !this.content) return;
     const exp = new SpeechSynthesisUtterance(this.content.explanation);
-    const ex = new SpeechSynthesisUtterance(this.content.example);
+    const ex = new SpeechSynthesisUtterance(this.content.examples.join('\n'));
     exp.voice = this.voice;
     ex.voice = this.voice;
     exp.onend = () => window.speechSynthesis.speak(ex);
