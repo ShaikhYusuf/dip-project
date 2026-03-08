@@ -1,0 +1,32 @@
+<div class="tf-container" *ngIf="tfSet">
+  @for (item of history; track $index) {
+    <mat-card class="history-card">
+      <mat-card-content>
+        <p><strong>Statement {{$index + 1}}:</strong> {{ item.question }}</p>
+        <p><strong>Your Answer:</strong> {{ item.selected }} - {{ item.isCorrect ? '✅ Correct' : '❌ Incorrect' }}</p>
+      </mat-card-content>
+    </mat-card>
+  }
+
+  @if (currentIndex < tfSet.questions.length  && !isShowingFeedback) {
+    <mat-card>
+      <mat-card-title>Statement {{currentIndex + 1}}</mat-card-title>
+      <mat-card-content>
+        <p>{{ tfSet.questions[currentIndex].question }}</p>
+        <mat-radio-group [(ngModel)]="selectedOption" class="options-list">
+          <mat-radio-button value="True">True</mat-radio-button>
+          <mat-radio-button value="False">False</mat-radio-button>
+        </mat-radio-group>
+      </mat-card-content>
+      <mat-card-actions>
+        <button mat-raised-button (click)="submitAnswer()" [disabled]="!selectedOption">Submit</button>
+      </mat-card-actions>
+    </mat-card>
+  } @else {
+    <mat-card>
+      <mat-card-content>
+        <h3>{{isShowingFeedback? "Feedback...": "Lesson Complete!" }}</h3>
+      </mat-card-content>
+    </mat-card>
+  }
+</div>

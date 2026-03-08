@@ -1,0 +1,20 @@
+<div class="container">
+  <mat-card>
+    <mat-card-title>Explanation</mat-card-title>
+    <mat-card-content>{{ content?.explanation }}</mat-card-content>
+  </mat-card>
+  <mat-card>
+    <mat-card-title>Example</mat-card-title>
+    <mat-card-content>
+      <ul>
+        @for (each_example of content?.examples; track $index) {
+          <li>{{ each_example }}</li>
+        }
+      </ul>
+    </mat-card-content>
+  </mat-card>
+
+  <div class="navigation-actions">
+    <button mat-raised-button color="primary" (click)="navigateToQuiz()">Next: Quiz</button>
+  </div>
+</div>

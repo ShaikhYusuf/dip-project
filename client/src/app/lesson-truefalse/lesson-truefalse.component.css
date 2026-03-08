@@ -1,0 +1,13 @@
+/* lesson-truefalse.component.css */
+.tf-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 40px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+.history-card {
+  opacity: 0.8;
+  background-color: #fafafa;
+}

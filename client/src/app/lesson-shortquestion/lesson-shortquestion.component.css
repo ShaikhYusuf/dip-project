@@ -1,0 +1,5 @@
+/* lesson-shortquestion.component.css */
+.sq-container { display: flex; flex-direction: column; gap: 20px; padding: 40px; max-width: 800px; margin: 0 auto; }
+.full-width { width: 100%; }
+.question-text { font-size: 1.2rem; margin-bottom: 16px; }
+.history-card { background-color: #f9f9f9; margin-bottom: 10px; }
