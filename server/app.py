@@ -1,0 +1,117 @@
+import atexit
+import json
+import asyncio
+import sys
+import sys
+from langchain_ollama import OllamaLLM
+from flask import Flask, jsonify, request
+from flask_cors import CORS
+
+from lib.x0_data_ingestor import DataIngestor
+from lib.x11_lesson_content import MyLessonContent
+from lib.x13_lesson_quiz import MyLessonQuiz
+from lib.x14_lesson_short_question import MyLessonShortQuestion
+from lib.x15_lesson_truefalse import MyLessonTrueFalse
+from lib.x1_llm_wrapper import LLM_Wrappper
+
+app = Flask(__name__)
+CORS(app) # Enables CORS for all routes
+
+# Global variable to hold the ingestor for cleanup
+_ingestor = None
+
+def cleanup():
+    """Closes the database connection on exit."""
+    global _ingestor
+    if _ingestor:
+        print("\nClosing database connection...")
+        _ingestor.close()
+        print("Cleanup complete.")
+
+def signal_handler(sig, frame):
+    """Handles manual termination (Ctrl+C)."""
+    sys.exit(0)
+
+# Register exit handlers
+atexit.register(cleanup)
+
+
+def initialize_app():
+    """Initializes global dependencies and lesson classes."""
+    db_params = {
+        "dbname": "postgres",
+        "user": "postgres",
+        "password": "postgres",
+        "host": "localhost"
+    }
+    
+    # Setup Data and LLM
+    global _ingestor
+    _ingestor = DataIngestor(db_params)
+    conn = _ingestor.get_connection()
+    model_name = "ministral-3:3b"
+    llm = None # OllamaLLM(model=model_name, format="json", temperature=0)
+
+    # Initialize all lesson classes
+    classes_to_init = [
+        LLM_Wrappper,
+        MyLessonContent, 
+        MyLessonQuiz, 
+        MyLessonShortQuestion, 
+        MyLessonTrueFalse
+    ]
+    
+    for cls in classes_to_init:
+        cls.initialize(llm, conn)
+    
+    return conn # Keep a reference if needed for cleanup
+
+async def get_and_store_information(LLM_Wrappper, db_params):
+    path="L1.S1.P1"
+    input_content_text = """
+    Photosynthesis is the process by which green plants and some other organisms use sunlight to synthesize foods with the help of chlorophyll. 
+    During photosynthesis, plants take in carbon dioxide from the air and water from the soil. 
+    Using the energy from sunlight, they convert these into glucose, a type of sugar that provides energy and growth material for the plant. 
+    Oxygen is released as a byproduct of this process, which is essential for the survival of most living organisms on Earth. 
+    Photosynthesis not only sustains the plant itself but also forms the base of the food chain for many ecosystems.
+    """
+    content = await LLM_Wrappper.generate_contents(path, input_content_text)
+    ingestor.close()
+
+@app.route('/lesson', methods=['GET'])
+async def get_lesson_content():
+    path = request.args.get('path')
+    lesson_content = await MyLessonContent.generate_response(path)
+    if lesson_content:
+        return jsonify(lesson_content.model_dump()), 200
+    return jsonify({"error": "Content not found"}), 404
+
+@app.route('/quizzes', methods=['GET'])
+async def get_lesson_quiz():
+    path = request.args.get('path')
+    lesson_quiz_set = await MyLessonQuiz.generate_response(path)
+    if lesson_quiz_set:
+        return jsonify(lesson_quiz_set.model_dump()), 200
+    return jsonify({"error": "Content not found"}), 404
+
+@app.route('/truefalses', methods=['GET'])
+async def get_lesson_true_false():
+    path = request.args.get('path')
+    lesson_true_false_set = await MyLessonTrueFalse.generate_response(path)
+    if lesson_true_false_set:
+        return jsonify(lesson_true_false_set.model_dump()), 200
+    return jsonify({"error": "Content not found"}), 404
+
+@app.route('/shortquestions', methods=['GET'])
+async def get_lesson_short_questions():
+    path = request.args.get('path')
+    lesson_short_questions_set = await MyLessonShortQuestion.generate_response(path)
+    if lesson_short_questions_set:
+        return jsonify(lesson_short_questions_set.model_dump()), 200
+    return jsonify({"error": "Content not found"}), 404
+
+if __name__ == "__main__":
+    initialize_app()
+    # asyncio.run(get_and_store_information(LLM_Wrappper, db_params))
+    print ("Starting Flask server...at port 5000")
+    app.run(debug=True, port=5000)
