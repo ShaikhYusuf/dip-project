@@ -1,5 +1,8 @@
 import json
 import numpy as np
+import json
+import re
+
 from pydantic import BaseModel, Field, field_validator
 from typing import List, Optional
 from langchain.output_parsers import PydanticOutputParser
@@ -50,6 +53,33 @@ class MyLessonQuiz():
     llm = None
     conn = None
 
+    @staticmethod
+    def _sanitize_parsed_quiz(raw_dict: dict) -> dict:
+        """Fix common format issues from model output before validation."""
+        if not raw_dict or "questions" not in raw_dict:
+            return raw_dict
+
+        for q in raw_dict.get("questions", []):
+            opts = q.get("options")
+            if isinstance(opts, list) and len(opts) > 4:
+                # Some models append stray tokens (e.g. 'answer”: ') into the options list.
+                q["options"] = opts[:4]
+
+        return raw_dict
+
+    @staticmethod
+    def _extract_json_from_error(e: Exception) -> Optional[dict]:
+        """Try to salvage JSON-like payload from a parsing exception message."""
+        text = str(e)
+        m = re.search(r"(\{.*\})", text, re.DOTALL)
+        if not m:
+            return None
+        json_text = m.group(1)
+        try:
+            return json.loads(json_text)
+        except json.JSONDecodeError:
+            return None
+
     @classmethod
     def initialize(cls, llm, conn):
         cls.llm = llm
@@ -85,6 +115,18 @@ class MyLessonQuiz():
                     )
                     chain = prompt | cls.llm | parser
                     continue
+
+                # Attempt to recover from common parsing issues (e.g., extra tokens in options).
+                raw_json = cls._extract_json_from_error(e)
+                if raw_json:
+                    raw_json = cls._sanitize_parsed_quiz(raw_json)
+                    try:
+                        response = QuizSet(**raw_json)
+                        break
+                    except Exception:
+                        pass
+
+                # If we can't recover, raise to surface the parsing issue.
                 raise
 
         if response is None:

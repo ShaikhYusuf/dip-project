@@ -1,0 +1,38 @@
+.container {
+  max-width: 900px;
+  margin: auto;
+  padding: 20px;
+}
+
+.title {
+  margin-bottom: 20px;
+  font-weight: 600;
+}
+
+.section-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 12px;
+  margin-bottom: 10px;
+
+  border-radius: 8px;
+  border: 1px solid #ddd;
+
+  background: #fafafa;
+}
+
+.section-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.section-path {
+  font-weight: 500;
+}
+
+mat-chip {
+  margin-right: 6px;
+}

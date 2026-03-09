@@ -10,11 +10,11 @@ import numpy as np
 
 from lib.x0_data_ingestor import DataIngestor
 from lib.x0_utility import Utility
+from lib.x10_lesson_store import MyLessonStore
 from lib.x11_lesson_content import MyLessonContent
 from lib.x13_lesson_quiz import MyLessonQuiz
 from lib.x14_lesson_short_question import MyLessonShortQuestion
 from lib.x15_lesson_truefalse import MyLessonTrueFalse
-from lib.x1_llm_wrapper import LLM_Wrappper
 
 app = Flask(__name__)
 CORS(app) # Enables CORS for all routes
@@ -56,7 +56,7 @@ def initialize_app():
 
     # Initialize all lesson classes
     classes_to_init = [
-        LLM_Wrappper,
+        MyLessonStore,
         MyLessonContent, 
         MyLessonQuiz, 
         MyLessonShortQuestion, 
@@ -67,18 +67,6 @@ def initialize_app():
         cls.initialize(llm, conn)
     
     return conn # Keep a reference if needed for cleanup
-
-async def get_and_store_information(LLM_Wrappper, db_params):
-    path="L1.S1.P1"
-    input_content_text = """
-    Photosynthesis is the process by which green plants and some other organisms use sunlight to synthesize foods with the help of chlorophyll. 
-    During photosynthesis, plants take in carbon dioxide from the air and water from the soil. 
-    Using the energy from sunlight, they convert these into glucose, a type of sugar that provides energy and growth material for the plant. 
-    Oxygen is released as a byproduct of this process, which is essential for the survival of most living organisms on Earth. 
-    Photosynthesis not only sustains the plant itself but also forms the base of the food chain for many ecosystems.
-    """
-    content = await LLM_Wrappper.generate_contents(path, input_content_text)
-    ingestor.close()
 
 @app.route('/lesson', methods=['GET'])
 async def get_lesson_content():
@@ -125,8 +113,22 @@ def compare_text_to_embedding():
         "match": bool(result)
     })
 
+@app.route('/lesson_hierarchy', methods=['GET'])
+def get_lesson_hierarchy():
+    try:
+        hierarchy = MyLessonStore.read_hierarchy_with_scores()
+        return jsonify([
+            h.model_dump() for h in hierarchy
+        ]), 200
+
+    except Exception as e:
+        return jsonify({
+            "error": str(e)
+        }), 500
+
 if __name__ == "__main__":
     initialize_app()
     # asyncio.run(get_and_store_information(LLM_Wrappper, db_params))
     print ("Starting Flask server...at port 5000")
     app.run(debug=True, port=5000)
+    

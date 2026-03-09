@@ -1,0 +1,71 @@
+<div class="container">
+
+  <h2 class="title">Learning Topics</h2>
+
+  <mat-accordion multi>
+
+    <!-- Topics -->
+    <mat-expansion-panel *ngFor="let topic of topics">
+
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          {{topic.title}}
+        </mat-panel-title>
+      </mat-expansion-panel-header>
+
+      <!-- Lessons -->
+      <mat-accordion multi>
+
+        <mat-expansion-panel *ngFor="let lesson of getLessons(topic.path)">
+
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              {{lesson.title}}
+            </mat-panel-title>
+          </mat-expansion-panel-header>
+
+          <!-- Sections -->
+          <div class="section-card"
+               *ngFor="let section of lesson.sections">
+
+            <div class="section-info">
+
+              <div class="section-path">
+                {{section.path}}
+              </div>
+
+              <mat-chip-set>
+
+                <mat-chip>
+                  Quiz: {{section.quiz_score}}
+                </mat-chip>
+
+                <mat-chip>
+                  True/False: {{section.truefalse_score}}
+                </mat-chip>
+
+                <mat-chip>
+                  Short Q: {{section.shortquestion_score}}
+                </mat-chip>
+
+              </mat-chip-set>
+
+            </div>
+
+            <button mat-raised-button
+                    color="primary"
+                    (click)="openLesson(section.path)">
+              Start Lesson
+            </button>
+
+          </div>
+
+        </mat-expansion-panel>
+
+      </mat-accordion>
+
+    </mat-expansion-panel>
+
+  </mat-accordion>
+
+</div>

@@ -25,5 +25,10 @@ export const routes: Routes = [
     path: 'lesson-shortquestion', 
     loadComponent: () => import('./lesson-shortquestion/lesson-shortquestion.component')
       .then(m => m.LessonShortQuestionComponent) 
-  }
+  },
+  { 
+    path: 'lesson-hierarchy',
+    loadComponent: () => import('./lesson-hierarchy/lesson-hierarchy.component')
+      .then(m => m.LessonHierarchyComponent) 
+  } 
 ];

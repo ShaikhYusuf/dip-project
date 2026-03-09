@@ -117,7 +117,7 @@ class MyLessonContent():
         # 2. Use ON CONFLICT to perform the UPDATE if the path already exists
         upsert_query = f"""
         INSERT INTO {cls.table_name} (path, paragraph, explanation, summary, examples)
-        VALUES (%s, %s, %s, %s, %s, %s)
+        VALUES (%s, %s, %s, %s, %s)
         ON CONFLICT (path) 
         DO UPDATE SET 
             paragraph = EXCLUDED.paragraph,
@@ -146,7 +146,7 @@ class MyLessonContent():
             
     @classmethod
     def read_data_db(cls, path: str) -> Optional[LessonContent]:
-        query = f"SELECT paragraph, explanation, summary, examples FROM {cls.table_name} WHERE path = '{path}'"
+        query = f"SELECT paragraph, explanation, summary, examples FROM {cls.table_name} WHERE path = %s"
 
         try:
             with cls.conn.cursor() as cur:

@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { ILessonContent, IQuizSet, IShortQuestionSet, ITrueFalseSet } from './app.model';
+import { ILessonContent, ILessonHierarchy, IQuizSet, IShortQuestionSet, ITrueFalseSet } from './app.model';
 
 @Injectable({
   providedIn: 'root'
@@ -33,5 +33,9 @@ export class GetDataService {
       text,
       embedding
     });
+  }
+
+  getLessonHierarchy(): Observable<ILessonHierarchy[]> {
+    return this.http.get<ILessonHierarchy[]>(`${this.baseUrl}//lesson_hierarchy`);
   }
 }

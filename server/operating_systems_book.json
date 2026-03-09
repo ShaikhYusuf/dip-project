@@ -1,0 +1,86 @@
+[
+  {
+    "id": "T01",
+    "content": "Operating Systems"
+  },
+  {
+    "id": "T01-L01",
+    "content": "Introduction to Operating Systems"
+  },
+  {
+    "id": "T01-L01-S01",
+    "content": "An operating system (OS) is system software that manages computer hardware and software resources. It acts as an intermediary between users and the computer hardware, ensuring that programs can run efficiently and safely."
+  },
+  {
+    "id": "T01-L01-S02",
+    "content": "Operating systems provide an environment in which users can execute programs conveniently. Without an OS, every program would need to directly control hardware such as memory, processors, and input/output devices."
+  },
+  {
+    "id": "T01-L01-S03",
+    "content": "The primary goals of an operating system are convenience, efficiency, and the ability to evolve. Convenience means making the system easier to use. Efficiency means utilizing hardware resources effectively."
+  },
+  {
+    "id": "T01-L01-S04",
+    "content": "Examples of operating systems include desktop systems, server operating systems, and mobile operating systems. Each type is designed for specific workloads and hardware environments."
+  },
+  {
+    "id": "T01-L02",
+    "content": "Operating System Functions"
+  },
+  {
+    "id": "T01-L02-S01",
+    "content": "Process management is responsible for creating, scheduling, and terminating processes. A process represents a program that is currently being executed by the CPU."
+  },
+  {
+    "id": "T01-L02-S02",
+    "content": "Memory management handles the allocation and deallocation of main memory. The operating system keeps track of which parts of memory are in use and ensures that processes do not interfere with each other."
+  },
+  {
+    "id": "T01-L02-S03",
+    "content": "File system management organizes data on storage devices. It provides mechanisms for storing, retrieving, naming, and protecting files so that users and applications can manage data effectively."
+  },
+  {
+    "id": "T01-L02-S04",
+    "content": "Device management controls input and output devices such as disks, keyboards, displays, and printers. The operating system uses device drivers to communicate with hardware devices."
+  },
+  {
+    "id": "T01-L03",
+    "content": "Process Concept"
+  },
+  {
+    "id": "T01-L03-S01",
+    "content": "A process is defined as a program in execution. It includes the program code as well as its current activity, including the program counter, CPU registers, stack, and data section."
+  },
+  {
+    "id": "T01-L03-S02",
+    "content": "Processes move through different states during their lifetime. Typical states include new, ready, running, waiting, and terminated."
+  },
+  {
+    "id": "T01-L03-S03",
+    "content": "The operating system uses scheduling algorithms to determine which process should run on the CPU at any given time. Scheduling is essential for multitasking systems."
+  },
+  {
+    "id": "T01-L03-S04",
+    "content": "Process control blocks (PCBs) are data structures used by the OS to store information about each process, including its state, program counter, registers, and scheduling information."
+  },
+  {
+    "id": "T01-L04",
+    "content": "Memory Management"
+  },
+  {
+    "id": "T01-L04-S01",
+    "content": "Memory management is responsible for managing the primary memory of a computer system. It ensures that each process receives sufficient memory to execute while maintaining system stability."
+  },
+  {
+    "id": "T01-L04-S02",
+    "content": "Techniques such as paging and segmentation allow the operating system to manage memory more efficiently by dividing memory into manageable units."
+  },
+  {
+    "id": "T01-L04-S03",
+    "content": "Virtual memory allows systems to execute programs that require more memory than physically available. It does this by using disk storage as an extension of main memory."
+  },
+  {
+    "id": "T01-L04-S04",
+    "content": "Proper memory management improves system performance, prevents processes from interfering with each other, and ensures fair allocation of memory resources."
+  }
+]

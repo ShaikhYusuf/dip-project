@@ -40,3 +40,18 @@ export interface IShortQuestion {
 export interface IShortQuestionSet {
   questions: IShortQuestion[];
 }
+
+//-------------------------------| Lesson Hierarchy Models |-------------------------------//
+export interface ISectionScore {
+  path: string;
+  quiz_score: number;
+  truefalse_score: number;
+  shortquestion_score: number;
+}
+
+export interface ILessonHierarchy {
+  path: string;
+  title: string;
+  parent_path: string | null;
+  sections: ISectionScore[];
+}
