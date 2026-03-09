@@ -20,7 +20,13 @@ class Utility:
 
     @classmethod
     def compare_text_to_embeddings(cls, embedding, text):
+        import torch
         text_embedding = cls.embed_model.encode(text, convert_to_tensor=True)
+        # Convert embedding to tensor with same dtype as text_embedding
+        if not isinstance(embedding, torch.Tensor):
+            embedding = torch.tensor(embedding, dtype=text_embedding.dtype)
+        else:
+            embedding = embedding.to(dtype=text_embedding.dtype)
         cosine_score = util.cos_sim(embedding, text_embedding).item()
         print(f"Match Score: {cosine_score:.2f}")
 

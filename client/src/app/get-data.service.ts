@@ -27,4 +27,11 @@ export class GetDataService {
   getLessonShortQuestions(path: string): Observable<IShortQuestionSet> {
     return this.http.get<IShortQuestionSet>(`${this.baseUrl}/shortquestions`, { params: { path } });
   }
+
+  compareTextToEmbedding(text: string, embedding: number[]): Observable<{ match: boolean }> {
+    return this.http.post<{ match: boolean }>(`${this.baseUrl}/compare_text_to_embedding`, {
+      text,
+      embedding
+    });
+  }
 }

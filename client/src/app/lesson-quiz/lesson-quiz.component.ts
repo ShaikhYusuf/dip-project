@@ -70,38 +70,38 @@ export class LessonQuizComponent implements OnInit {
 
   submitAnswerVoice() {
     this.voiceService.listen((heard) => {
-      const spoken = heard.toLowerCase();
-      this.processAnswer(spoken);
+      this.processAnswer(heard);
     });
   }
 
   submitAnswer() {
     window.speechSynthesis.cancel();
     const currentQ = this.quizSet.questions[this.currentIndex];
-    const isCorrect = this.selectedOption === currentQ.answer;
     this.processAnswer(this.selectedOption);
   }
 
-
   processAnswer(userAnswer: string) {
-    this.isShowingFeedback = true; // Block the current card from showing inputs
-    this.cdr.detectChanges();
 
     const currentQ = this.quizSet.questions[this.currentIndex];
     const answer = currentQ.answer.toLowerCase();
     const spoken = userAnswer.toLowerCase();
 
-    const similarity = this.utilityService.similarity(answer, spoken);
-    const isCorrect = similarity >= 0.8;
+    //const similarity = this.utilityService.similarity(answer, spoken);
+    this.quizService.compareTextToEmbedding(spoken, currentQ.answer_embedding!).subscribe(response => { 
+      const isCorrect = response.match;
+
+    this.isShowingFeedback = true; // Block the current card from showing inputs
+    this.cdr.detectChanges();
 
     this.history.push({
-        question: currentQ.question,
-        answer: currentQ.answer,
-        userAnswer: userAnswer,
-        isCorrect: isCorrect
-      });
+          question: currentQ.question,
+          answer: currentQ.answer,
+          userAnswer: userAnswer,
+          isCorrect: isCorrect
+        });
 
-    this.readExplanation(isCorrect);
+      this.readExplanation(isCorrect);
+    })
   }
 
   nextQuestion() {

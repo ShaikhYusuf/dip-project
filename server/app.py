@@ -6,8 +6,10 @@ import sys
 from langchain_ollama import OllamaLLM
 from flask import Flask, jsonify, request
 from flask_cors import CORS
+import numpy as np
 
 from lib.x0_data_ingestor import DataIngestor
+from lib.x0_utility import Utility
 from lib.x11_lesson_content import MyLessonContent
 from lib.x13_lesson_quiz import MyLessonQuiz
 from lib.x14_lesson_short_question import MyLessonShortQuestion
@@ -109,6 +111,19 @@ async def get_lesson_short_questions():
     if lesson_short_questions_set:
         return jsonify(lesson_short_questions_set.model_dump()), 200
     return jsonify({"error": "Content not found"}), 404
+
+@app.route("/compare_text_to_embedding", methods=["POST"])
+def compare_text_to_embedding():
+    data = request.get_json()
+    text = data.get("text")
+    embedding_list = data.get("embedding")
+    if text is None or embedding_list is None:
+        return jsonify({"error": "text and embedding are required"}), 400
+    embedding = np.array(embedding_list)
+    result = Utility.compare_text_to_embeddings(embedding, text)
+    return jsonify({
+        "match": bool(result)
+    })
 
 if __name__ == "__main__":
     initialize_app()

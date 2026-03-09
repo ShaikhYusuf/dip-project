@@ -30,8 +30,8 @@ export class LessonShortQuestionComponent implements OnInit {
   isShowingFeedback = false;
 
   constructor(
-    private sqService: GetDataService,
     private route: ActivatedRoute,
+    private sqService: GetDataService,
     private utilityService: AppUtilityService,
     private voiceService: VoiceService,
     private cdr: ChangeDetectorRef) {}
@@ -54,8 +54,7 @@ export class LessonShortQuestionComponent implements OnInit {
 
   submitAnswerVoice() {
     this.voiceService.listen((heard) => {
-      const spoken = heard.toLowerCase();
-      this.processAnswer(spoken);
+      this.processAnswer(heard);
     });
   }
 
@@ -66,24 +65,28 @@ export class LessonShortQuestionComponent implements OnInit {
   }
 
   processAnswer(userAnswer: string) {
-    this.isShowingFeedback = true; // Block the current card from showing inputs
-    this.cdr.detectChanges();
 
     const currentQ = this.sqSet.questions[this.currentIndex];
-    const answer = currentQ.answer.toLowerCase();
-    const spoken = userAnswer.toLowerCase();
+    const answer = currentQ.answer;
+    const spoken = userAnswer;
 
-    const similarity = this.utilityService.similarity(answer, spoken);
-    const isCorrect = similarity >= 0.8;
+    //const similarity = this.utilityService.similarity(answer, spoken);
+    this.sqService.compareTextToEmbedding(spoken, currentQ.answer_embedding!).subscribe(response => { 
+      const isCorrect = response.match;
+      this.isShowingFeedback = true; // Block the current card from showing inputs
+      this.cdr.detectChanges();
 
-    this.history.push({
-        question: currentQ.question,
-        answer: currentQ.answer,
-        userAnswer: userAnswer
+      this.history.push({
+            question: currentQ.question,
+            answer: currentQ.answer,
+            userAnswer: userAnswer,
+          });
+
+        const feedback = isCorrect
+          ? `That is correct. The answer is, ${currentQ.answer}`
+          : `That is incorrect. The answer is, ${currentQ.answer}`;
+        this.voiceService.speak(feedback, ()=> this.nextQuestion());
       });
-
-    const feedback = `Answer is, ${currentQ.answer}`;
-    this.voiceService.speak(feedback, ()=> this.nextQuestion());
   }
 
   nextQuestion() {

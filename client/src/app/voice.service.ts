@@ -23,9 +23,10 @@ export class VoiceService {
 
     if (SR) {
       this.recognition = new SR();
-      this.recognition.continuous = false;
-      this.recognition.interimResults = false;
+      this.recognition.continuous = true;
+      this.recognition.interimResults = true;
       this.recognition.lang = 'en-US';
+      this.recognition.maxAlternatives = 3;
     }
   }
 
@@ -38,7 +39,6 @@ export class VoiceService {
     const voice = this.voiceSubject.value;
     if (!voice) return;
 
-    // cancel previous speech and listening
     window.speechSynthesis.cancel();
     this.stopListening();
 
@@ -52,40 +52,58 @@ export class VoiceService {
     window.speechSynthesis.speak(utter);
   }
 
-  listen(callback: (heard: string) => void, timeout = 5000) {
+  listen(callback: (heard: string) => void, timeout = 3000) {
 
     if (!this.recognition) return;
 
-    // cancel speaking and previous listening
     window.speechSynthesis.cancel();
     this.stopListening();
 
     let finished = false;
+    let finalTranscript = '';
+    let silenceTimer: any;
 
     const finish = (text: string) => {
       if (finished) return;
       finished = true;
+      clearTimeout(silenceTimer);
       this.stopListening();
-      callback(text);
+      callback(text.trim());
     };
 
-    const timer = setTimeout(() => {
-      finish('');
-    }, timeout);
+    const resetSilenceTimer = () => {
+      clearTimeout(silenceTimer);
+      silenceTimer = setTimeout(() => {
+        finish(finalTranscript);
+      }, timeout);
+    };
 
     this.recognition.onresult = (event: any) => {
-      clearTimeout(timer);
-      const transcript = event.results[0][0].transcript.trim();
-      finish(transcript);
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const result = event.results[i];
+        const transcript = result[0].transcript;
+
+        if (result.isFinal) {
+          finalTranscript += transcript + ' ';
+        }
+      }
+      resetSilenceTimer();
     };
 
     this.recognition.onerror = () => {
-      clearTimeout(timer);
-      finish('');
+      finish(finalTranscript);
+    };
+
+    this.recognition.onend = () => {
+      if (!finished && this.listening) {
+        try { this.recognition.start(); } catch {}
+      }
     };
 
     this.recognition.start();
     this.listening = true;
+
+    resetSilenceTimer();
   }
 
   private stopListening() {
