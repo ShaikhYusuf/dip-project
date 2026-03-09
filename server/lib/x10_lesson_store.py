@@ -321,7 +321,6 @@ class MyLessonStore():
             input_content_text)
         response = await content_true_false.generate_response(path)
         print("Lesson True/False Response:", response)
-        
 
     @classmethod
     def read_all_scores_db(cls) -> List[LessonScore]:
@@ -380,3 +379,54 @@ class MyLessonStore():
                 hierarchy_map[lesson_path].sections.append(score)
 
         return list(hierarchy_map.values())
+    
+    @classmethod
+    def update_quiz_score(cls, path: str, quiz_score: int) -> bool:
+        query = f"""
+        UPDATE {cls.table_scores}
+        SET quiz_score = %s
+        WHERE path = %s
+        """
+        try:
+            with cls.conn.cursor() as cur:
+                cur.execute(query, (quiz_score, path))
+            cls.conn.commit()
+            return True
+        except Exception as e:
+            cls.conn.rollback()
+            print("Error updating quiz score:", e)
+            return False
+
+    @classmethod
+    def update_truefalse_score(cls, path: str, truefalse_score: int) -> bool:
+        query = f"""
+        UPDATE {cls.table_scores}
+        SET truefalse_score = %s
+        WHERE path = %s
+        """
+        try:
+            with cls.conn.cursor() as cur:
+                cur.execute(query, (truefalse_score, path))
+            cls.conn.commit()
+            return True
+        except Exception as e:
+            cls.conn.rollback()
+            print("Error updating true/false score:", e)
+            return False
+
+    @classmethod
+    def update_shortquestion_score(cls, path: str, shortquestion_score: int) -> bool:
+        query = f"""
+        UPDATE {cls.table_scores}
+        SET shortquestion_score = %s
+        WHERE path = %s
+        """
+        try:
+            with cls.conn.cursor() as cur:
+                cur.execute(query, (shortquestion_score, path))
+            cls.conn.commit()
+            return True
+        except Exception as e:
+            cls.conn.rollback()
+            print("Error updating short‑question score:", e)
+            return False

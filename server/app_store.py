@@ -71,9 +71,8 @@ async def get_and_store_information():
 
     sectionList  = MyLessonStore.read_all_section_db()
     for section in sectionList:
-        if section == sectionList[2]:
-            await MyLessonStore.generate_contents(section.path, section.content)
-            break
+        await MyLessonStore.generate_contents(section.path, section.content)
+        break
 
 
 if __name__ == "__main__":

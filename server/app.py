@@ -126,6 +126,40 @@ def get_lesson_hierarchy():
             "error": str(e)
         }), 500
 
+@app.route('/update_scores', methods=['POST'])
+def update_scores():
+    try:
+        data = request.get_json()
+        path = data.get('path')
+        
+        if not path:
+            return jsonify({"error": "path is required"}), 400
+        
+        results = {}
+        score_fields = ['quiz_score', 'truefalse_score', 'short_question_score']
+        if not any(field in data for field in score_fields):
+            return jsonify({"error": "No scores to update"}), 400
+        
+        if 'quiz_score' in data:
+            MyLessonStore.update_quiz_score(path, data['quiz_score'])
+            results['quiz_score'] = 'updated'
+        
+        if 'truefalse_score' in data:
+            MyLessonStore.update_truefalse_score(path, data['truefalse_score'])
+            results['truefalse_score'] = 'updated'
+        
+        if 'short_question_score' in data:
+            MyLessonStore.update_short_question_score(path, data['short_question_score'])
+            results['short_question_score'] = 'updated'
+        
+        if not results:
+            return jsonify({"error": "No scores to update"}), 400
+        
+        return jsonify({"message": "Scores updated successfully", "updated": results}), 200
+    
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 if __name__ == "__main__":
     initialize_app()
     # asyncio.run(get_and_store_information(LLM_Wrappper, db_params))

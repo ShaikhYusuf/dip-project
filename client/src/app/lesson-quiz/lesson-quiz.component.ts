@@ -7,9 +7,9 @@ import { FormsModule } from '@angular/forms';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatButtonModule} from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
-import { GetDataService } from '../get-data.service';
+import { AppDataService } from '../app-data.service';
 import { VoiceService } from '../voice.service';
-import { IQuizSet } from '../app.model';
+import { IQuizSet, IScoreUpdate } from '../app.model';
 import { AppUtilityService } from '../app.utility.service';
 
 
@@ -31,7 +31,7 @@ export class LessonQuizComponent implements OnInit {
   constructor(
     private router: Router,
     private route: ActivatedRoute,
-    private quizService: GetDataService, 
+    private quizService: AppDataService, 
     private utilityService: AppUtilityService,
     private voiceService: VoiceService,
     private cdr: ChangeDetectorRef) {}
@@ -114,8 +114,23 @@ export class LessonQuizComponent implements OnInit {
     }
   }
 
-  navigateToNextPage() {
-    const path = this.route.snapshot.queryParams['path'];
-    this.router.navigate(['/lesson-truefalse'], { queryParams: { path } });
-  }
+
+    navigateToNextPage() {
+      // count how many answers in the history were marked correct
+      const score = this.history.reduce((sum, h) => sum + (h.isCorrect ? 1 : 0), 0);
+
+      // send the score back to the data service before navigating away
+      // (adjust the method/parameters to whatever your AppDataService exposes)
+      const path = this.route.snapshot.queryParams['path'];
+      let scoreUpdate: IScoreUpdate = { quiz_score: score }
+      this.quizService.updateScores(path, scoreUpdate).subscribe(
+        () => {
+          this.router.navigate(['/lesson-truefalse'], { queryParams: { path } });
+        },
+        err => {
+          console.error('unable to update quiz score', err);
+            this.router.navigate(['/']);
+        }
+      );
+    }
 }

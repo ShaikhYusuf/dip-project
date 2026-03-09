@@ -1,12 +1,12 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { ILessonContent, ILessonHierarchy, IQuizSet, IShortQuestionSet, ITrueFalseSet } from './app.model';
+import { ILessonContent, ILessonHierarchy, IQuizSet, IScoreUpdate, IShortQuestionSet, ITrueFalseSet } from './app.model';
 
 @Injectable({
   providedIn: 'root'
 })
-export class GetDataService {
+export class AppDataService {
 
   private readonly baseUrl = 'http://localhost:5000';
 
@@ -37,5 +37,12 @@ export class GetDataService {
 
   getLessonHierarchy(): Observable<ILessonHierarchy[]> {
     return this.http.get<ILessonHierarchy[]>(`${this.baseUrl}//lesson_hierarchy`);
+  }
+
+  updateScores(path: string, scores: Partial<IScoreUpdate>): Observable<{ message: string; updated: Record<string, string> }> {
+    return this.http.post<{ message: string; updated: Record<string, string> }>(
+      `${this.baseUrl}/update_scores`,
+      { path, ...scores }
+    );
   }
 }

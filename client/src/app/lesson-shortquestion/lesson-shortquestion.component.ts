@@ -1,16 +1,16 @@
 // lesson-shortquestion.component.ts
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { FormsModule } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { GetDataService } from '../get-data.service';
+import { AppDataService } from '../app-data.service';
 import { VoiceService } from '../voice.service';
-import { IShortQuestionSet } from '../app.model';
+import { IScoreUpdate, IShortQuestionSet } from '../app.model';
 import { AppUtilityService } from '../app.utility.service';
 
 
@@ -26,12 +26,13 @@ export class LessonShortQuestionComponent implements OnInit {
   sqSet!: IShortQuestionSet;
   currentIndex = 0;
   userAnswer: string = '';
-  history: { question: string, answer: string, userAnswer: string }[] = [];
+  history: { question: string, answer: string, userAnswer: string , isCorrect: boolean}[] = [];
   isShowingFeedback = false;
 
   constructor(
+    private router: Router,
     private route: ActivatedRoute,
-    private sqService: GetDataService,
+    private sqService: AppDataService,
     private utilityService: AppUtilityService,
     private voiceService: VoiceService,
     private cdr: ChangeDetectorRef) {}
@@ -80,6 +81,7 @@ export class LessonShortQuestionComponent implements OnInit {
             question: currentQ.question,
             answer: currentQ.answer,
             userAnswer: userAnswer,
+            isCorrect: isCorrect
           });
 
         const feedback = isCorrect
@@ -98,4 +100,23 @@ export class LessonShortQuestionComponent implements OnInit {
       this.readCurrentQuestion();
     }
   }
+
+  navigateToNextPage() {
+      // count how many answers in the history were marked correct
+      const score = this.history.reduce((sum, h) => sum + (h.isCorrect ? 1 : 0), 0);
+  
+      // send the score back to the data service before navigating away
+      // (adjust the method/parameters to whatever your AppDataService exposes)
+      const path = this.route.snapshot.queryParams['path'];
+      let scoreUpdate: IScoreUpdate = { truefalse_score: score }
+      this.sqService.updateScores(path, scoreUpdate).subscribe(
+        () => {
+          this.router.navigate(['/']);
+        },
+        err => {
+          console.error('unable to update truefalse score', err);
+          this.router.navigate(['/']);
+        }
+      );
+    }
 }

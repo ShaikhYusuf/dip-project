@@ -2,7 +2,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
-import { GetDataService } from '../get-data.service';
+import { AppDataService } from '../app-data.service';
 import { VoiceService } from '../voice.service';
 import { ILessonContent } from '../app.model';
 
@@ -20,7 +20,7 @@ export class LessonContentComponent implements OnInit {
   constructor(
     private router: Router,
     private route: ActivatedRoute,
-    private getDataService: GetDataService,
+    private getDataService: AppDataService,
     private voiceService: VoiceService
   ) {}
 

@@ -55,3 +55,10 @@ export interface ILessonHierarchy {
   parent_path: string | null;
   sections: ISectionScore[];
 }
+
+//-------------------------------| Score Update Models |-------------------------------//
+export interface IScoreUpdate {
+  quiz_score?: number;
+  truefalse_score?: number;
+  shortquestion_score?: number;
+}

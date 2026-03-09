@@ -9,7 +9,7 @@ import { MatIconModule } from '@angular/material/icon';
 
 import { Router } from '@angular/router';
 import { ILessonHierarchy } from '../app.model';
-import { GetDataService } from '../get-data.service';
+import { AppDataService } from '../app-data.service';
 
 
 @Component({
@@ -34,7 +34,7 @@ export class LessonHierarchyComponent implements OnInit {
 
   constructor(
     private router: Router,
-    private getDataService: GetDataService
+    private getDataService: AppDataService
   ) {}
 
   ngOnInit(): void {
