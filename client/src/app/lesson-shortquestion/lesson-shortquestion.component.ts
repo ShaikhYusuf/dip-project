@@ -44,17 +44,15 @@ export class LessonShortQuestionComponent implements OnInit {
   }
 
   readCurrentQuestion() {
-    if (!this.voice || !this.sqSet) return;
-    window.speechSynthesis.cancel();
+    if (!this.sqSet) return;
     const text = this.sqSet.questions[this.currentIndex].question;
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.voice = this.voice;
-    window.speechSynthesis.speak(utterance);
+    this.voiceService.speak(text);
   }
 
   submitAnswer() {
     window.speechSynthesis.cancel();
     this.isShowingFeedback = true; // Block the current card from showing inputs
+    this.cdr.detectChanges();
 
     const currentQ = this.sqSet.questions[this.currentIndex];
     this.history.push({
@@ -63,12 +61,7 @@ export class LessonShortQuestionComponent implements OnInit {
       userAnswer: this.userAnswer
     });
     const feedback = `The correct answer is, ${currentQ.answer}`;
-    const utterance = new SpeechSynthesisUtterance(feedback);
-    utterance.voice = this.voice;
-    utterance.onend = () => {
-      this.nextQuestion();
-    };
-    window.speechSynthesis.speak(utterance);
+    this.voiceService.speak(feedback, () => this.nextQuestion());
   }
 
   nextQuestion() {

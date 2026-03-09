@@ -35,16 +35,13 @@ export class LessonContentComponent implements OnInit {
 
   readContent() {
     if (!this.voice || !this.content) return;
-    const exp = new SpeechSynthesisUtterance(this.content.explanation);
-    const ex = new SpeechSynthesisUtterance(this.content.examples.join('\n'));
-    exp.voice = this.voice;
-    ex.voice = this.voice;
-    exp.onend = () => window.speechSynthesis.speak(ex);
-    window.speechSynthesis.speak(exp);
+    this.voiceService.speak(this.content.explanation, () => {
+      this.voiceService.speak(this.content.examples.join('\n'));
+    })
   }
 
-  navigateToQuiz() {
-  const path = this.route.snapshot.queryParams['path'];
-  this.router.navigate(['/lesson-quiz'], { queryParams: { path } });
-}
+  navigateToNextPage() {
+    const path = this.route.snapshot.queryParams['path'];
+    this.router.navigate(['/lesson-quiz'], { queryParams: { path } });
+  }
 }

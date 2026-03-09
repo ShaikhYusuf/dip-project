@@ -1,7 +1,7 @@
 // lesson-truefalse.component.ts
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatButtonModule } from '@angular/material/button';
@@ -27,8 +27,9 @@ export class LessonTrueFalseComponent implements OnInit {
   isShowingFeedback = false;
 
   constructor(
-    private tfService: GetDataService,
+    private router: Router,
     private route: ActivatedRoute,
+    private tfService: GetDataService,
     private voiceService: VoiceService,
     private cdr: ChangeDetectorRef) {}
 
@@ -43,13 +44,10 @@ export class LessonTrueFalseComponent implements OnInit {
   }
 
   readCurrentQuestion() {
-    if (!this.voice || !this.tfSet) return;
-    window.speechSynthesis.cancel();
+    if (!this.tfSet) return;
     const q = this.tfSet.questions[this.currentIndex];
     const text = `${q.question}`;
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.voice = this.voice;
-    window.speechSynthesis.speak(utterance);
+    this.voiceService.speak(text);
   }
 
   submitAnswer() {
@@ -63,13 +61,8 @@ export class LessonTrueFalseComponent implements OnInit {
       selected: this.selectedOption,
       isCorrect: isCorrect
     });
-    const feedback = `The correct answer is, ${currentQ.answer}`;
-    const utterance = new SpeechSynthesisUtterance(feedback);
-    utterance.voice = this.voice;
-    utterance.onend = () => {
-      this.nextQuestion();
-    };
-    window.speechSynthesis.speak(utterance);
+    const feedback = `Answer is, ${currentQ.answer}`;
+    this.voiceService.speak(feedback, ()=> this.nextQuestion());
   }
 
   nextQuestion() {
@@ -80,5 +73,10 @@ export class LessonTrueFalseComponent implements OnInit {
     if (this.currentIndex < this.tfSet.questions.length) {
       this.readCurrentQuestion();
     }
+  }
+
+  navigateToNextPage() {
+    const path = this.route.snapshot.queryParams['path'];
+    this.router.navigate(['/lesson-shortquestion'], { queryParams: { path } });
   }
 }

@@ -51,7 +51,7 @@ export class VoiceSelectionComponent {
   navigateToLesson() {
     if (this.selectedVoice) {
       this.voiceService.setVoice(this.selectedVoice);
-      this.router.navigate(['/lesson-quiz'], { queryParams: { path: 'L1.S1.P1' } });
+      this.router.navigate(['/lesson-content'], { queryParams: { path: 'L1.S1.P1' } });
     }
   }
 }

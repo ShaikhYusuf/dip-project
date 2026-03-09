@@ -1,7 +1,7 @@
 // lesson-quiz.component.ts
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatButtonModule } from '@angular/material/button';
@@ -27,8 +27,9 @@ export class LessonQuizComponent implements OnInit {
   isShowingFeedback = false;
 
   constructor(
-    private quizService: GetDataService, 
+    private router: Router,
     private route: ActivatedRoute,
+    private quizService: GetDataService, 
     private voiceService: VoiceService,
     private cdr: ChangeDetectorRef) {}
 
@@ -52,24 +53,18 @@ export class LessonQuizComponent implements OnInit {
   }
 
   readCurrentQuestion() {
-    if (!this.voice || !this.quizSet) return;
-    window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(this.formatQuestionForSpeech());
-    utterance.voice = this.voice;
-    window.speechSynthesis.speak(utterance);
+    if (!this.quizSet) return;
+    this.voiceService.speak(this.formatQuestionForSpeech());
   }
+
   readExplanation(isRight: boolean = true) {
     if (!this.voice || !this.quizSet) return;
     const text = isRight 
       ? `That is correct. ${this.quizSet.questions[this.currentIndex].explanation}`
       : `That is incorrect. ${this.quizSet.questions[this.currentIndex].explanation}`;
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.voice = this.voice;
-    window.speechSynthesis.speak(utterance);
-    utterance.onend = () => {
-      this.nextQuestion();
-    };
+    this.voiceService.speak(text, () => this.nextQuestion());
   }
+
   submitAnswer() {
     window.speechSynthesis.cancel();
     this.isShowingFeedback = true; // Block the current card from showing inputs
@@ -95,5 +90,10 @@ export class LessonQuizComponent implements OnInit {
     if (this.currentIndex < this.quizSet.questions.length) {
       this.readCurrentQuestion();
     }
+  }
+
+  navigateToNextPage() {
+    const path = this.route.snapshot.queryParams['path'];
+    this.router.navigate(['/lesson-truefalse'], { queryParams: { path } });
   }
 }

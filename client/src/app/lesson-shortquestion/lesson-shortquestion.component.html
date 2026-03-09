@@ -26,7 +26,9 @@
   } @else {
     <mat-card>
       <mat-card-content>
-        <h3>{{isShowingFeedback? "Feedback...": "Lesson Complete!" }}</h3>
+        <div class="explanation">
+          <p><strong>Explanation:</strong> {{ sqSet.questions[currentIndex].answer }}</p>
+        </div>
       </mat-card-content>
     </mat-card>
   }
