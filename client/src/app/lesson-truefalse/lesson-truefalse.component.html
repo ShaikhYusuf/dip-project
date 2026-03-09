@@ -3,7 +3,7 @@
     <mat-card class="history-card">
       <mat-card-content>
         <p><strong>Statement {{$index + 1}}:</strong> {{ item.question }}</p>
-        <p><strong>Your Answer:</strong> {{ item.selected }} - {{ item.isCorrect ? '✅ Correct' : '❌ Incorrect' }}</p>
+        <p><strong>Your Answer:</strong> {{ item.userAnswer }} - {{ item.isCorrect ? '✅ Correct' : '❌ Incorrect' }}</p>
       </mat-card-content>
     </mat-card>
   }
@@ -19,6 +19,9 @@
         </mat-radio-group>
       </mat-card-content>
       <mat-card-actions>
+        <button mat-icon-button color="primary" (click)="submitAnswerVoice()">
+          <mat-icon>mic</mat-icon>
+        </button>
         <button mat-raised-button (click)="submitAnswer()" [disabled]="!selectedOption">Submit</button>
       </mat-card-actions>
     </mat-card>

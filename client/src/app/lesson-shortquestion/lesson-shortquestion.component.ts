@@ -2,6 +2,7 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
+import { MatIconModule } from '@angular/material/icon';
 import { FormsModule } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
@@ -10,12 +11,13 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { GetDataService } from '../get-data.service';
 import { VoiceService } from '../voice.service';
 import { IShortQuestionSet } from '../app.model';
+import { AppUtilityService } from '../app.utility.service';
 
 
 @Component({
   selector: 'app-lesson-shortquestion',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatInputModule, MatButtonModule, MatCardModule, MatFormFieldModule],
+  imports: [CommonModule, MatIconModule, FormsModule, MatInputModule, MatButtonModule, MatCardModule, MatFormFieldModule],
   templateUrl: './lesson-shortquestion.component.html',
   styleUrls: ['./lesson-shortquestion.component.css']
 })
@@ -30,6 +32,7 @@ export class LessonShortQuestionComponent implements OnInit {
   constructor(
     private sqService: GetDataService,
     private route: ActivatedRoute,
+    private utilityService: AppUtilityService,
     private voiceService: VoiceService,
     private cdr: ChangeDetectorRef) {}
 
@@ -49,19 +52,38 @@ export class LessonShortQuestionComponent implements OnInit {
     this.voiceService.speak(text);
   }
 
+  submitAnswerVoice() {
+    this.voiceService.listen((heard) => {
+      const spoken = heard.toLowerCase();
+      this.processAnswer(spoken);
+    });
+  }
+
   submitAnswer() {
     window.speechSynthesis.cancel();
+    const currentQ = this.sqSet.questions[this.currentIndex];
+    this.processAnswer(this.userAnswer);
+  }
+
+  processAnswer(userAnswer: string) {
     this.isShowingFeedback = true; // Block the current card from showing inputs
     this.cdr.detectChanges();
 
     const currentQ = this.sqSet.questions[this.currentIndex];
+    const answer = currentQ.answer.toLowerCase();
+    const spoken = userAnswer.toLowerCase();
+
+    const similarity = this.utilityService.similarity(answer, spoken);
+    const isCorrect = similarity >= 0.8;
+
     this.history.push({
-      question: currentQ.question,
-      answer: currentQ.answer,
-      userAnswer: this.userAnswer
-    });
-    const feedback = `The correct answer is, ${currentQ.answer}`;
-    this.voiceService.speak(feedback, () => this.nextQuestion());
+        question: currentQ.question,
+        answer: currentQ.answer,
+        userAnswer: userAnswer
+      });
+
+    const feedback = `Answer is, ${currentQ.answer}`;
+    this.voiceService.speak(feedback, ()=> this.nextQuestion());
   }
 
   nextQuestion() {

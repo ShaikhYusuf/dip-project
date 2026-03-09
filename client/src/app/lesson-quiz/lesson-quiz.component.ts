@@ -2,19 +2,21 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
+import { MatIconModule } from '@angular/material/icon';
 import { FormsModule } from '@angular/forms';
 import { MatRadioModule } from '@angular/material/radio';
-import { MatButtonModule } from '@angular/material/button';
+import { MatButtonModule} from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { GetDataService } from '../get-data.service';
 import { VoiceService } from '../voice.service';
 import { IQuizSet } from '../app.model';
+import { AppUtilityService } from '../app.utility.service';
 
 
 @Component({
   selector: 'app-lesson-quiz',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatRadioModule, MatButtonModule, MatCardModule],
+  imports: [CommonModule, MatIconModule, FormsModule, MatRadioModule, MatButtonModule, MatCardModule],
   templateUrl: './lesson-quiz.component.html',
   styleUrls: ['./lesson-quiz.component.css']
 })
@@ -23,13 +25,14 @@ export class LessonQuizComponent implements OnInit {
   quizSet!: IQuizSet ;
   currentIndex = 0;
   selectedOption: string = '';
-  history: { question: string, selected: string, answer: string, isCorrect: boolean }[] = [];
+  history: { question: string, answer: string, userAnswer: string, isCorrect: boolean }[] = [];
   isShowingFeedback = false;
 
   constructor(
     private router: Router,
     private route: ActivatedRoute,
     private quizService: GetDataService, 
+    private utilityService: AppUtilityService,
     private voiceService: VoiceService,
     private cdr: ChangeDetectorRef) {}
 
@@ -65,21 +68,40 @@ export class LessonQuizComponent implements OnInit {
     this.voiceService.speak(text, () => this.nextQuestion());
   }
 
+  submitAnswerVoice() {
+    this.voiceService.listen((heard) => {
+      const spoken = heard.toLowerCase();
+      this.processAnswer(spoken);
+    });
+  }
+
   submitAnswer() {
     window.speechSynthesis.cancel();
-    this.isShowingFeedback = true; // Block the current card from showing inputs
-    this.cdr.detectChanges();
     const currentQ = this.quizSet.questions[this.currentIndex];
     const isCorrect = this.selectedOption === currentQ.answer;
+    this.processAnswer(this.selectedOption);
+  }
 
-      this.history.push({
+
+  processAnswer(userAnswer: string) {
+    this.isShowingFeedback = true; // Block the current card from showing inputs
+    this.cdr.detectChanges();
+
+    const currentQ = this.quizSet.questions[this.currentIndex];
+    const answer = currentQ.answer.toLowerCase();
+    const spoken = userAnswer.toLowerCase();
+
+    const similarity = this.utilityService.similarity(answer, spoken);
+    const isCorrect = similarity >= 0.8;
+
+    this.history.push({
         question: currentQ.question,
-        selected: this.selectedOption,
         answer: currentQ.answer,
+        userAnswer: userAnswer,
         isCorrect: isCorrect
       });
 
-      this.readExplanation(isCorrect);
+    this.readExplanation(isCorrect);
   }
 
   nextQuestion() {
