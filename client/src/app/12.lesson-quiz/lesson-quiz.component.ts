@@ -1,7 +1,7 @@
 // lesson-quiz.component.ts
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, NavigationStart, Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { FormsModule } from '@angular/forms';
 import { MatRadioModule } from '@angular/material/radio';
@@ -21,7 +21,6 @@ import { AppUtilityService } from '../app.utility.service';
   styleUrls: ['./lesson-quiz.component.css']
 })
 export class LessonQuizComponent implements OnInit {
-  voice: SpeechSynthesisVoice | null = null;
   quizSet!: IQuizSet ;
   currentIndex = 0;
   selectedOption: string = '';
@@ -35,12 +34,17 @@ export class LessonQuizComponent implements OnInit {
     private quizService: AppDataService, 
     private utilityService: AppUtilityService,
     private voiceService: VoiceService,
-    private cdr: ChangeDetectorRef) {}
+    private cdr: ChangeDetectorRef) {
+      this.router.events.subscribe(event => {
+      if (event instanceof NavigationStart) {
+        this.voiceService.stopSpeaking();
+      }
+    });
+    }
 
   ngOnInit() {
     const path = this.route.snapshot.queryParams['path'];
     this.nextPage = this.route.snapshot.queryParams['next'] || '/lesson-truefalse';
-    this.voiceService.selectedVoice$.subscribe(v => this.voice = v);
     this.quizService.getLessonQuiz(path).subscribe((data: IQuizSet) => {
       this.quizSet = data;
       this.readCurrentQuestion();
@@ -63,7 +67,7 @@ export class LessonQuizComponent implements OnInit {
   }
 
   readExplanation(isRight: boolean = true) {
-    if (!this.voice || !this.quizSet) return;
+    if (!this.quizSet) return;
     const text = isRight 
       ? `That is correct. ${this.quizSet.questions[this.currentIndex].explanation}`
       : `That is incorrect. ${this.quizSet.questions[this.currentIndex].explanation}`;

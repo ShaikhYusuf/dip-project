@@ -1,7 +1,7 @@
 // lesson-content.component.ts
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, NavigationStart, Router } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { AppDataService } from '../app-data.service';
 import { VoiceService } from '../voice.service';
@@ -15,7 +15,6 @@ import { ILessonContent } from '../app.model';
   templateUrl: './lesson-content.component.html'
 })
 export class LessonContentComponent implements OnInit {
-  voice: SpeechSynthesisVoice | null = null;
   content!: ILessonContent ;
   nextPage: string = '/lesson-quiz';
 
@@ -24,10 +23,15 @@ export class LessonContentComponent implements OnInit {
     private route: ActivatedRoute,
     private getDataService: AppDataService,
     private voiceService: VoiceService
-  ) {}
+  ) {
+    this.router.events.subscribe(event => {
+      if (event instanceof NavigationStart) {
+        this.voiceService.stopSpeaking();
+      }
+    });
+  }
 
   ngOnInit() {
-    this.voiceService.selectedVoice$.subscribe(v => this.voice = v);
     const path = this.route.snapshot.queryParams['path'];
     this.nextPage = this.route.snapshot.queryParams['next'] || '/lesson-quiz';
     this.getDataService.getLessonContent(path).subscribe((data: ILessonContent) => {
@@ -37,7 +41,7 @@ export class LessonContentComponent implements OnInit {
   }
 
   readContent() {
-    if (!this.voice || !this.content) return;
+    if ( !this.content) return;
     this.voiceService.speak(this.content.explanation, () => {
       this.voiceService.speak(this.content.examples.join('\n'));
     })

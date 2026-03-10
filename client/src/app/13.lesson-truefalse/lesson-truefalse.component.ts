@@ -1,7 +1,7 @@
 // lesson-truefalse.component.ts
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, NavigationStart, Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { FormsModule } from '@angular/forms';
 import { MatRadioModule } from '@angular/material/radio';
@@ -21,7 +21,6 @@ import { AppUtilityService } from '../app.utility.service';
   styleUrls: ['./lesson-truefalse.component.css']
 })
 export class LessonTrueFalseComponent implements OnInit {
-  voice: SpeechSynthesisVoice | null = null;
   tfSet!: ITrueFalseSet;
   currentIndex = 0;
   selectedOption: string = '';
@@ -35,12 +34,17 @@ export class LessonTrueFalseComponent implements OnInit {
     private tfService: AppDataService,
     private utilityService: AppUtilityService,
     private voiceService: VoiceService,
-    private cdr: ChangeDetectorRef) { }
+    private cdr: ChangeDetectorRef) { 
+      this.router.events.subscribe(event => {
+      if (event instanceof NavigationStart) {
+        this.voiceService.stopSpeaking();
+      }
+    });
+    }
 
   ngOnInit() {
     const path = this.route.snapshot.queryParams['path'];
     this.nextPage = this.route.snapshot.queryParams['next'] || '/lesson-shortquestion';
-    this.voiceService.selectedVoice$.subscribe(v => this.voice = v);
     this.tfService.getLessonTrueFalse(path).subscribe((data: ITrueFalseSet) => {
       this.tfSet = data;
       this.readCurrentQuestion();

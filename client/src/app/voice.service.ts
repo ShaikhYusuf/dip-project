@@ -72,6 +72,11 @@ export class VoiceService {
     window.speechSynthesis.speak(utter);
   }
 
+  stopSpeaking() {
+    window.speechSynthesis.cancel();
+    this.stopListening();
+  }
+
   listen(callback: (heard: string) => void, timeout = 3000) {
 
     if (!this.recognition) return;

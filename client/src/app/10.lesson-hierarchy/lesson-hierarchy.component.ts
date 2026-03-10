@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { NavigationStart, RouterModule } from '@angular/router';
 
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatButtonModule } from '@angular/material/button';
@@ -10,6 +10,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { Router } from '@angular/router';
 import { ILessonHierarchy } from '../app.model';
 import { AppDataService } from '../app-data.service';
+import { VoiceService } from '../voice.service';
 
 
 @Component({
@@ -34,8 +35,15 @@ export class LessonHierarchyComponent implements OnInit {
 
   constructor(
     private router: Router,
+    private voiceService: VoiceService,
     private getDataService: AppDataService
-  ) {}
+  ) {
+    this.router.events.subscribe(event => {
+      if (event instanceof NavigationStart) {
+        this.voiceService.stopSpeaking();
+      }
+    });
+  }
 
   ngOnInit(): void {
     this.loadHierarchy();

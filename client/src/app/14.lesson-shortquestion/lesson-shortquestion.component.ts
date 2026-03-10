@@ -1,7 +1,7 @@
 // lesson-shortquestion.component.ts
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, NavigationStart, Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { FormsModule } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
@@ -22,7 +22,6 @@ import { AppUtilityService } from '../app.utility.service';
   styleUrls: ['./lesson-shortquestion.component.css']
 })
 export class LessonShortQuestionComponent implements OnInit {
-  voice: SpeechSynthesisVoice | null = null;
   sqSet!: IShortQuestionSet;
   currentIndex = 0;
   userAnswer: string = '';
@@ -36,12 +35,17 @@ export class LessonShortQuestionComponent implements OnInit {
     private sqService: AppDataService,
     private utilityService: AppUtilityService,
     private voiceService: VoiceService,
-    private cdr: ChangeDetectorRef) {}
+    private cdr: ChangeDetectorRef) {
+      this.router.events.subscribe(event => {
+      if (event instanceof NavigationStart) {
+        this.voiceService.stopSpeaking();
+      }
+    });
+    }
 
   ngOnInit() {
     const path = this.route.snapshot.queryParams['path'];
     this.nextPage = this.route.snapshot.queryParams['next'] || '/lesson-hierarchy';
-    this.voiceService.selectedVoice$.subscribe(v => this.voice = v);
     this.sqService.getLessonShortQuestions(path).subscribe((data: IShortQuestionSet) => {
       this.sqSet = data;
       this.readCurrentQuestion();
