@@ -27,6 +27,7 @@ export class LessonQuizComponent implements OnInit {
   selectedOption: string = '';
   history: { question: string, answer: string, userAnswer: string, isCorrect: boolean }[] = [];
   isShowingFeedback = false;
+  nextPage: string = '/lesson-truefalse';
 
   constructor(
     private router: Router,
@@ -38,6 +39,7 @@ export class LessonQuizComponent implements OnInit {
 
   ngOnInit() {
     const path = this.route.snapshot.queryParams['path'];
+    this.nextPage = this.route.snapshot.queryParams['next'] || '/lesson-truefalse';
     this.voiceService.selectedVoice$.subscribe(v => this.voice = v);
     this.quizService.getLessonQuiz(path).subscribe((data: IQuizSet) => {
       this.quizSet = data;
@@ -125,7 +127,7 @@ export class LessonQuizComponent implements OnInit {
       let scoreUpdate: IScoreUpdate = { quiz_score: score }
       this.quizService.updateScores(path, scoreUpdate).subscribe(
         () => {
-          this.router.navigate(['/lesson-truefalse'], { queryParams: { path } });
+          this.router.navigate([this.nextPage], { queryParams: { path } });
         },
         err => {
           console.error('unable to update quiz score', err);

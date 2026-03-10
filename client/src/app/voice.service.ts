@@ -28,6 +28,26 @@ export class VoiceService {
       this.recognition.lang = 'en-US';
       this.recognition.maxAlternatives = 3;
     }
+
+    this.ensureDefaultVoice();
+  }
+
+  private ensureDefaultVoice() {
+
+    const setDefault = () => {
+      if (this.voiceSubject.value) return;
+
+      const voices = speechSynthesis.getVoices();
+      if (voices.length > 0) {
+        this.voiceSubject.next(voices[0]);
+      }
+    };
+
+    setDefault();
+
+    if (speechSynthesis.onvoiceschanged !== undefined) {
+      speechSynthesis.onvoiceschanged = () => setDefault();
+    }
   }
 
   setVoice(voice: SpeechSynthesisVoice) {

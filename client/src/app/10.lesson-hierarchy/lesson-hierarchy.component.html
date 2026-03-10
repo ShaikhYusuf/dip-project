@@ -5,7 +5,7 @@
   <mat-accordion multi>
 
     <!-- Topics -->
-    <mat-expansion-panel *ngFor="let topic of topics">
+    <mat-expansion-panel *ngFor="let topic of topics; let i = index" [expanded]="i === 0">
 
       <mat-expansion-panel-header>
         <mat-panel-title>
@@ -16,7 +16,7 @@
       <!-- Lessons -->
       <mat-accordion multi>
 
-        <mat-expansion-panel *ngFor="let lesson of getLessons(topic.path)">
+        <mat-expansion-panel *ngFor="let lesson of getLessons(topic.path); let i = index" [expanded]="i === 0">
 
           <mat-expansion-panel-header>
             <mat-panel-title>
@@ -36,15 +36,15 @@
 
               <mat-chip-set>
 
-                <mat-chip>
+                <mat-chip (click)="openRoute(section.path, '/lesson-quiz')">
                   Quiz: {{section.quiz_score}}
                 </mat-chip>
 
-                <mat-chip>
+                <mat-chip (click)="openRoute(section.path, '/lesson-truefalse')">
                   True/False: {{section.truefalse_score}}
                 </mat-chip>
 
-                <mat-chip>
+                <mat-chip (click)="openRoute(section.path, '/lesson-shortquestion')">
                   Short Q: {{section.shortquestion_score}}
                 </mat-chip>
 

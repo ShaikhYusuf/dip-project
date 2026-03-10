@@ -1,0 +1,25 @@
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px;
+}
+
+.voice-card {
+  width: 500px;
+  padding: 10px;
+}
+
+.full-width {
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+mat-card-title {
+  font-size: 22px;
+  font-weight: 600;
+}
+
+mat-card-subtitle {
+  font-size: 14px;
+}

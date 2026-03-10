@@ -10,12 +10,21 @@ from lib.x0_utility import Utility
 
 #------------------- True/False Quiz Template ------------------#
 TF_QUIZ_PROMPT_TEMPLATE = """
-You are an expert tutor. Based on the paragraph below, create a series of True/False questions.
+You are an expert educator.
 
-Rules:
-1. Each question must be a clear statement.
-2. The answer must be either "True" or "False".
-3. Provide a clear explanation for the answer based strictly on the text.
+Your task is to generate True/False questions STRICTLY following the schema.
+
+VERY IMPORTANT RULES:
+1. Generate EXACTLY 5 questions.
+2. Each question MUST be a declarative statement (not a question).
+3. The answer MUST be exactly either "True" or "False".
+4. Each statement must test a different concept from the paragraph.
+5. Provide a clear explanation based strictly on the paragraph.
+6. NEVER omit required fields.
+7. Do NOT generate extra fields.
+8. Use simple and student-friendly language.
+9. Output ONLY valid JSON.
+10. Do NOT include explanations outside the JSON.
 
 Paragraph:
 {paragraph}

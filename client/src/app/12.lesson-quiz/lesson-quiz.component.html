@@ -45,6 +45,6 @@
 
 <div>
   <button mat-raised-button color="primary" (click)="navigateToNextPage()">
-    Next: True/False
+    Next {{nextPage.replace('/lesson-', '') | titlecase}}
   </button>
 </div>

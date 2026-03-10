@@ -27,6 +27,7 @@ export class LessonTrueFalseComponent implements OnInit {
   selectedOption: string = '';
   history: { question: string, userAnswer: string, isCorrect: boolean }[] = [];
   isShowingFeedback = false;
+  nextPage: string = '/lesson-shortquestion';
 
   constructor(
     private router: Router,
@@ -38,6 +39,7 @@ export class LessonTrueFalseComponent implements OnInit {
 
   ngOnInit() {
     const path = this.route.snapshot.queryParams['path'];
+    this.nextPage = this.route.snapshot.queryParams['next'] || '/lesson-shortquestion';
     this.voiceService.selectedVoice$.subscribe(v => this.voice = v);
     this.tfService.getLessonTrueFalse(path).subscribe((data: ITrueFalseSet) => {
       this.tfSet = data;
@@ -107,7 +109,7 @@ export class LessonTrueFalseComponent implements OnInit {
     let scoreUpdate: IScoreUpdate = { truefalse_score: score }
     this.tfService.updateScores(path, scoreUpdate).subscribe(
       () => {
-        this.router.navigate(['/lesson-shortquestion'], { queryParams: { path } });
+        this.router.navigate([this.nextPage], { queryParams: { path } });
       },
       err => {
         console.error('unable to update truefalse score', err);

@@ -1,7 +1,7 @@
 import json
-import numpy as np
-import json
 import re
+import logging
+import numpy as np
 
 from pydantic import BaseModel, Field, field_validator
 from typing import List, Optional
@@ -11,15 +11,23 @@ from langchain.prompts import PromptTemplate
 
 from lib.x0_utility import Utility
 
+logging.basicConfig(level=logging.INFO)
+
 #------------------- Quiz Template ------------------#
 QUIZ_PROMPT_TEMPLATE = """
-You are an expert educator. Based on the paragraph provided below, create a high-quality multiple-choice quiz.
+You are an expert educator.
 
-Instructions:
-1. Create **exactly 5** challenging but fair questions based ONLY on the paragraph.
-2. For each question, provide exactly 4 distinct options.
-3. Identify the correct answer for each question.
-4. Provide a student-friendly explanation for each answer.
+Your task is to generate a multiple-choice quiz STRICTLY following the schema.
+
+RULES (VERY IMPORTANT):
+1. Generate EXACTLY 5 questions.
+2. Each question MUST contain EXACTLY 4 options.
+3. Options MUST be short phrases.
+4. The "answer" MUST be EXACTLY one of the 4 options.
+5. NEVER generate more than 4 options.
+6. NEVER omit the fields: question, options, answer, explanation.
+7. Do NOT add extra fields.
+8. Output ONLY valid JSON.
 
 Paragraph:
 {paragraph}
@@ -54,18 +62,27 @@ class MyLessonQuiz():
     conn = None
 
     @staticmethod
-    def _sanitize_parsed_quiz(raw_dict: dict) -> dict:
-        """Fix common format issues from model output before validation."""
-        if not raw_dict or "questions" not in raw_dict:
-            return raw_dict
+    def sanitize(raw: dict) -> dict:
+        if "questions" not in raw:
+            return raw
 
-        for q in raw_dict.get("questions", []):
-            opts = q.get("options")
-            if isinstance(opts, list) and len(opts) > 4:
-                # Some models append stray tokens (e.g. 'answer”: ') into the options list.
-                q["options"] = opts[:4]
+        cleaned = []
+        for q in raw["questions"]:
+            options = q.get("options", [])
+            if isinstance(options, list):
+                options = options[:4]
+                while len(options) < 4:
+                    options.append("Unknown")
 
-        return raw_dict
+            q["options"] = options
+            if "answer" not in q:
+                q["answer"] = options[0]
+
+            if "explanation" not in q:
+                q["explanation"] = "Explanation unavailable."
+            cleaned.append(q)
+        raw["questions"] = cleaned[:5]
+        return raw
 
     @staticmethod
     def _extract_json_from_error(e: Exception) -> Optional[dict]:

@@ -10,13 +10,21 @@ from lib.x0_utility import Utility
 
 #------------------- Short Questions Template ------------------#
 SHORT_QUESTION_PROMPT_TEMPLATE = """
-You are an expert tutor. Based on the paragraph below, create exactly 5 diverse short-answer questions.
+You are an expert educator.
 
-Instructions:
-1. Questions should be open-ended (Avoid Yes/No).
-2. Each question should test a different detail or concept from the text.
-3. Provide a 'sample_answer' that is concise and accurate.
-4. Keep the language simple and student-friendly.
+Your task is to generate short-answer questions STRICTLY following the schema.
+
+VERY IMPORTANT RULES:
+1. Generate EXACTLY 5 questions.
+2. Questions MUST be open-ended. NEVER create Yes/No questions.
+3. Each question must focus on a DIFFERENT concept from the paragraph.
+4. Each question MUST include a concise and correct "sample_answer".
+5. NEVER omit fields.
+6. Do NOT generate extra fields.
+7. Use simple, student-friendly language.
+8. The answer must be short (1–2 sentences).
+9. Output ONLY valid JSON.
+10. Do NOT include explanations outside the JSON.
 
 Paragraph:
 {paragraph}

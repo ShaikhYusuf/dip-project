@@ -293,7 +293,7 @@ class MyLessonStore():
             input_content_text)
         
         response = await content.generate_response(path)
-        print("Lesson Content Response:", response)
+        print("Lesson Content Response:", response is not None)
         
         print(f"Generating Lesson Quiz for {path}...")
         content_quiz = MyLessonQuiz()
@@ -302,7 +302,7 @@ class MyLessonStore():
             path, 
             input_content_text)
         response = await content_quiz.generate_response(path)
-        print("Lesson Quiz Response:", response)
+        print("Lesson Quiz Response:", response is not None)
         
         print(f"Generating Lesson Short Question for {path}...")
         content_shortquestion = MyLessonShortQuestion()
@@ -311,7 +311,7 @@ class MyLessonStore():
             path, 
             input_content_text)
         response = await content_shortquestion.generate_response(path)
-        print("Lesson Short Question Response:", response)
+        print("Lesson Short Question Response:", response is not None)
         
         print(f"Generating Lesson True/False for {path}...")
         content_true_false = MyLessonTrueFalse()
@@ -320,7 +320,7 @@ class MyLessonStore():
             path, 
             input_content_text)
         response = await content_true_false.generate_response(path)
-        print("Lesson True/False Response:", response)
+        print("Lesson True/False Response:", response is not None)
 
     @classmethod
     def read_all_scores_db(cls) -> List[LessonScore]:

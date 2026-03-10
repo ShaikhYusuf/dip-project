@@ -65,15 +65,13 @@ def initialize_store_app():
     return conn # Keep a reference if needed for cleanup
 
 async def get_and_store_information():
-    with open("operating_systems_book.json", "r") as f:
-        json_data = json.load(f)
-        MyLessonStore.insert_data_df(json_data)
+    # with open("operating_systems_book.json", "r") as f:
+    #     json_data = json.load(f)
+    #     MyLessonStore.insert_data_df(json_data)
 
     sectionList  = MyLessonStore.read_all_section_db()
     for section in sectionList:
         await MyLessonStore.generate_contents(section.path, section.content)
-        break
-
 
 if __name__ == "__main__":
     initialize_store_app()

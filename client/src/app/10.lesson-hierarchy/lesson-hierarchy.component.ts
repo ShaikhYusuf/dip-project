@@ -55,7 +55,13 @@ export class LessonHierarchyComponent implements OnInit {
 
   openLesson(path: string) {
     this.router.navigate(['/lesson-content'], {
-      queryParams: { path: path }
+      queryParams: { path: path, next: "/lesson-quiz" }
+    });
+  }
+
+  openRoute(path: string, currentRoute: string) {
+    this.router.navigate([currentRoute], {
+      queryParams: { path: path, next: "/lesson-hierarchy" }
     });
   }
 

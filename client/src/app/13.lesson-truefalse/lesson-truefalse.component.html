@@ -34,5 +34,7 @@
   }
 </div>
 <div class="navigation-actions">
-    <button mat-raised-button color="primary" (click)="navigateToNextPage()">Next: True/False</button>
+    <button mat-raised-button color="primary" (click)="navigateToNextPage()">
+      Next {{nextPage.replace('/lesson-', '') | titlecase}}
+    </button>
 </div>

@@ -1,1 +1,26 @@
-<router-outlet></router-outlet>
+<mat-toolbar color="primary" class="topbar">
+
+  <span class="app-title" routerLink="/">Learning App</span>
+
+  <span class="spacer"></span>
+
+  <button mat-button routerLink="/">
+    <mat-icon>menu_book</mat-icon>
+    Topics
+  </button>
+
+  <button mat-button routerLink="/settings">
+    <mat-icon>settings</mat-icon>
+    Settings
+  </button>
+
+  <button mat-button (click)="exitApp()">
+    <mat-icon>logout</mat-icon>
+    Exit
+  </button>
+
+</mat-toolbar>
+
+<div class="main-container">
+  <router-outlet></router-outlet>
+</div>

@@ -7,12 +7,23 @@ from langchain.prompts import PromptTemplate
 
 #------------------- Match the Column Template ------------------#
 MATCHING_PROMPT_TEMPLATE = """
-You are an expert tutor. From the paragraph below, extract exactly 5 pairs of related terms and their descriptions for a 'Match the Column' exercise.
+You are an expert educator.
 
-Instructions:
-1. Column A (left_item) should contain a key term or concept.
-2. Column B (right_item) should contain its corresponding definition or explanation.
-3. Ensure the pairs are distinct and directly supported by the text.
+Your task is to generate a "Match the Column" exercise STRICTLY following the schema.
+
+VERY IMPORTANT RULES:
+1. Generate EXACTLY 5 matching pairs.
+2. Each pair must contain:
+   - left_item : a key term or concept.
+   - right_item : its correct definition or explanation.
+3. Each pair must represent a DIFFERENT concept from the paragraph.
+4. left_item must be SHORT (1–4 words).
+5. right_item must be a clear explanation (1 short sentence).
+6. Do NOT repeat concepts.
+7. NEVER omit required fields.
+8. Do NOT generate extra fields.
+9. Output ONLY valid JSON.
+10. Do NOT include explanations outside the JSON.
 
 Paragraph:
 {paragraph}

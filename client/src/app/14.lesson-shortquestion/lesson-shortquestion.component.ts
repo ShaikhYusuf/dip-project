@@ -28,6 +28,7 @@ export class LessonShortQuestionComponent implements OnInit {
   userAnswer: string = '';
   history: { question: string, answer: string, userAnswer: string , isCorrect: boolean}[] = [];
   isShowingFeedback = false;
+  nextPage: string = '/lesson-hierarchy';
 
   constructor(
     private router: Router,
@@ -39,6 +40,7 @@ export class LessonShortQuestionComponent implements OnInit {
 
   ngOnInit() {
     const path = this.route.snapshot.queryParams['path'];
+    this.nextPage = this.route.snapshot.queryParams['next'] || '/lesson-hierarchy';
     this.voiceService.selectedVoice$.subscribe(v => this.voice = v);
     this.sqService.getLessonShortQuestions(path).subscribe((data: IShortQuestionSet) => {
       this.sqSet = data;
@@ -111,11 +113,11 @@ export class LessonShortQuestionComponent implements OnInit {
       let scoreUpdate: IScoreUpdate = { truefalse_score: score }
       this.sqService.updateScores(path, scoreUpdate).subscribe(
         () => {
-          this.router.navigate(['/']);
+          this.router.navigate([this.nextPage], { queryParams: { path } });
         },
         err => {
           console.error('unable to update truefalse score', err);
-          this.router.navigate(['/']);
+          this.router.navigate([this.nextPage], { queryParams: { path } });
         }
       );
     }
