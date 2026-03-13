@@ -1,18 +1,58 @@
+/* ── Glassmorphic Toolbar ── */
 .topbar {
   position: sticky;
   top: 0;
   z-index: 1000;
+  height: 64px;
+  padding: 0 20px;
+}
+
+.topbar .back-btn {
+  margin-right: 4px;
+  color: var(--text-secondary);
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.topbar .back-btn:hover {
+  color: var(--primary-color);
+  transform: translateX(-2px);
+}
+
+.app-title {
+  font-weight: 800;
+  font-size: 1.25rem;
+  cursor: pointer;
+  background: linear-gradient(135deg, var(--primary-color), #ec4899);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -0.5px;
 }
 
 .spacer {
   flex: 1 1 auto;
 }
 
-.app-title {
-  font-weight: 600;
-  cursor: pointer;
+.topbar button {
+  font-weight: 500;
+  letter-spacing: 0.2px;
+  border-radius: 12px !important;
+  transition: background 0.2s ease !important;
 }
 
+.topbar button:hover {
+  background: var(--hover-bg) !important;
+}
+
+/* ── Main Container ── */
 .main-container {
-  padding: 20px;
+  padding: 28px 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+  animation: fadeInUp 0.4s ease;
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
 }

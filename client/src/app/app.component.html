@@ -1,10 +1,19 @@
 <mat-toolbar color="primary" class="topbar">
 
-  <span class="app-title" routerLink="/">Learning App</span>
+  <button mat-icon-button class="back-btn" (click)="goBack()" aria-label="Go back" matTooltip="Go Back">
+    <mat-icon>arrow_back</mat-icon>
+  </button>
+
+  <span class="app-title" routerLink="/">YoZo</span>
 
   <span class="spacer"></span>
 
-  <button mat-button routerLink="/">
+  <button mat-button routerLink="/dashboard">
+    <mat-icon>dashboard</mat-icon>
+    Dashboard
+  </button>
+
+  <button mat-button routerLink="/lesson-hierarchy">
     <mat-icon>menu_book</mat-icon>
     Topics
   </button>
@@ -12,6 +21,20 @@
   <button mat-button routerLink="/settings">
     <mat-icon>settings</mat-icon>
     Settings
+  </button>
+
+  <button mat-button routerLink="/profile">
+    <mat-icon>person</mat-icon>
+    Profile
+  </button>
+
+  <button mat-button routerLink="/admin">
+    <mat-icon>admin_panel_settings</mat-icon>
+    Admin
+  </button>
+
+  <button mat-icon-button (click)="toggleDarkMode()" aria-label="Toggle dark mode">
+    <mat-icon>{{ isDarkMode ? 'light_mode' : 'dark_mode' }}</mat-icon>
   </button>
 
   <button mat-button (click)="exitApp()">

@@ -1,0 +1,97 @@
+<div class="profile-container">
+
+  <h2 class="page-title stagger-item">
+    <mat-icon class="title-icon">person</mat-icon>
+    My Profile
+  </h2>
+
+  <!-- Message -->
+  <div class="message-banner stagger-item" *ngIf="message"
+       [class.success]="messageType === 'success'"
+       [class.error]="messageType === 'error'">
+    <mat-icon>{{ messageType === 'success' ? 'check_circle' : 'error' }}</mat-icon>
+    {{ message }}
+  </div>
+
+  <div class="profile-grid" *ngIf="profile">
+
+    <!-- Profile Card -->
+    <mat-card class="profile-card stagger-item">
+      <div class="avatar-section">
+        <div class="avatar-circle">
+          <span>{{ getInitials() }}</span>
+        </div>
+        <h3 class="profile-name">{{ profile.name }}</h3>
+        <p class="profile-email">{{ profile.email }}</p>
+        <div class="role-badge" [class.admin]="profile.role === 'admin'">
+          <mat-icon>{{ profile.role === 'admin' ? 'shield' : 'school' }}</mat-icon>
+          {{ profile.role | titlecase }}
+        </div>
+        <p class="joined-date">
+          <mat-icon>calendar_today</mat-icon>
+          Joined {{ profile.created_at | date:'mediumDate' }}
+        </p>
+      </div>
+    </mat-card>
+
+    <!-- Edit Profile Card -->
+    <mat-card class="edit-card stagger-item">
+      <div class="card-header">
+        <div class="card-icon-wrap">
+          <mat-icon>edit</mat-icon>
+        </div>
+        <h3 class="card-title">Edit Profile</h3>
+      </div>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Name</mat-label>
+        <input matInput [(ngModel)]="editName" placeholder="Your name">
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Avatar URL</mat-label>
+        <input matInput [(ngModel)]="editAvatar" placeholder="https://example.com/avatar.jpg">
+      </mat-form-field>
+
+      <button class="btn-premium save-btn" (click)="saveProfile()">
+        <mat-icon>save</mat-icon>
+        Save Changes
+      </button>
+    </mat-card>
+
+    <!-- Change Password Card -->
+    <mat-card class="edit-card stagger-item">
+      <div class="card-header" (click)="showPasswordForm = !showPasswordForm" style="cursor: pointer;">
+        <div class="card-icon-wrap pwd-icon">
+          <mat-icon>lock</mat-icon>
+        </div>
+        <h3 class="card-title">Change Password</h3>
+        <mat-icon class="expand-icon">{{ showPasswordForm ? 'expand_less' : 'expand_more' }}</mat-icon>
+      </div>
+
+      <div *ngIf="showPasswordForm" class="password-form">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Current Password</mat-label>
+          <input matInput type="password" [(ngModel)]="oldPassword">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>New Password</mat-label>
+          <input matInput type="password" [(ngModel)]="newPassword">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Confirm New Password</mat-label>
+          <input matInput type="password" [(ngModel)]="confirmPassword">
+        </mat-form-field>
+
+        <button class="btn-premium pwd-btn" (click)="changePassword()">
+          <mat-icon>vpn_key</mat-icon>
+          Update Password
+        </button>
+      </div>
+    </mat-card>
+
+  </div>
+
+</div>

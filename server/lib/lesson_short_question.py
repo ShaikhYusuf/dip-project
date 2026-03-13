@@ -6,7 +6,7 @@ from langchain.output_parsers import PydanticOutputParser
 from langchain_core.exceptions import OutputParserException
 from langchain.prompts import PromptTemplate
 
-from lib.x0_utility import Utility
+from lib.utility import Utility
 
 #------------------- Short Questions Template ------------------#
 SHORT_QUESTION_PROMPT_TEMPLATE = """

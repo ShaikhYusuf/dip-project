@@ -1,44 +1,101 @@
-<div class="sq-container" *ngIf="sqSet">
-  @for (item of history; track $index) {
-    <mat-card class="history-card">
-      <mat-card-content>
-        <p><strong>Q:</strong> {{ item.question }}</p>
-        <p><strong>Your Answer:</strong> {{ item.userAnswer }}</p>
-        <p><strong>Ideal Answer:</strong> {{ item.answer }}</p>
-      </mat-card-content>
-    </mat-card>
-  }
+<div class="elite-quiz-container" *ngIf="sqSet">
 
-  @if (currentIndex < sqSet.questions.length && !isShowingFeedback) {
-    <mat-card>
-      <mat-card-title>Question {{currentIndex + 1}}</mat-card-title>
-      <mat-card-content>
-        <p class="question-text">{{ sqSet.questions[currentIndex].question }}</p>
-        <mat-form-field class="full-width" appearance="outline">
-          <mat-label>Your Answer</mat-label>
-          <textarea matInput [(ngModel)]="userAnswer" rows="2"></textarea>
-        </mat-form-field>
-      </mat-card-content>
-      <mat-card-actions>
-        <button mat-icon-button color="primary" (click)="submitAnswerVoice()">
-          <mat-icon>mic</mat-icon>
-        </button>
-        <button mat-raised-button (click)="submitAnswer()" [disabled]="!userAnswer">Submit</button>
-      </mat-card-actions>
-    </mat-card>
-  } @else {
-    <mat-card>
-      <mat-card-content>
-        <div class="explanation">
-          <p><strong>Explanation:</strong> {{ sqSet.questions[currentIndex].answer }}</p>
+  <!-- Audio Controls + Timer -->
+  <div class="controls-bar stagger-item">
+    <div class="audio-controls">
+      <button mat-icon-button (click)="replaySpeaking()" matTooltip="Replay" class="audio-btn">
+        <mat-icon>replay</mat-icon>
+      </button>
+      <button mat-icon-button (click)="stopSpeaking()" matTooltip="Stop Speaking" class="audio-btn stop" *ngIf="isSpeaking">
+        <mat-icon>stop_circle</mat-icon>
+      </button>
+      <span class="audio-status" *ngIf="isSpeaking">
+        <span class="pulse-dot"></span>
+        Speaking...
+      </span>
+    </div>
+    <div class="timer-display" matTooltip="Elapsed time">
+      <mat-icon class="timer-icon">timer</mat-icon>
+      <span class="timer-value">{{ formattedTimer }}</span>
+    </div>
+  </div>
+
+  <!-- History / Feedback Cards -->
+  <div class="history-section" *ngIf="history.length > 0">
+    @for (item of history; track $index) {
+    <div class="feedback-card stagger-item" [class.correct]="item.isCorrect" [class.incorrect]="!item.isCorrect">
+      <div class="feedback-header">
+        <mat-icon class="status-icon">{{ item.isCorrect ? 'check_circle' : 'cancel' }}</mat-icon>
+        <span class="question-number">Question {{$index + 1}}</span>
+      </div>
+      <p class="history-question">{{ item.question }}</p>
+
+      <div class="answer-comparison">
+        <div class="user-answer-pill" [class.correct]="item.isCorrect" [class.incorrect]="!item.isCorrect">
+          <span class="pill-label">You answered:</span>
+          <strong>{{ item.userAnswer }}</strong>
         </div>
-      </mat-card-content>
-    </mat-card>
-  }
-</div>
+        <div class="correct-answer-pill" *ngIf="!item.isCorrect">
+          <span class="pill-label">Ideal answer:</span>
+          <strong>{{ item.answer }}</strong>
+        </div>
+      </div>
+    </div>
+    }
+  </div>
 
-<div class="navigation-actions">
-    <button mat-raised-button color="primary" (click)="navigateToNextPage()">
-      Next {{nextPage.replace('/lesson-', '') | titlecase}}
+  <!-- Active Question Card -->
+  @if (currentIndex < sqSet.questions.length && !isShowingFeedback) { <div class="active-question-card stagger-item">
+    <div class="question-header">
+      <span class="progress-badge">Question {{currentIndex + 1}} of {{sqSet.questions.length}}</span>
+    </div>
+
+    <h2 class="question-text">{{ sqSet.questions[currentIndex].question }}</h2>
+
+    <!-- Custom Elite Text Area -->
+    <div class="elite-textarea-wrapper" [class.focused]="isTextareaFocused">
+      <textarea class="elite-textarea" [(ngModel)]="userAnswer"
+        placeholder="Type your answer here, or click the mic to speak..." rows="3" (focus)="isTextareaFocused = true"
+        (blur)="isTextareaFocused = false"></textarea>
+    </div>
+
+    <div class="action-footer">
+      @if (isListening) {
+      <div class="listen-indicator">
+        <span class="pulse-dot"></span> Listening...
+      </div>
+      }
+
+      <button class="voice-btn" mat-icon-button (click)="submitAnswerVoice()" [class.listening]="isListening"
+        matTooltip="Answer with voice">
+        <mat-icon>mic</mat-icon>
+      </button>
+      <button class="elite-submit-btn btn-premium" (click)="submitAnswer()"
+        [disabled]="!userAnswer">
+        Check Answer
+      </button>
+    </div>
+</div>
+} @else {
+<!-- Feedback with Skip Button -->
+<div class="active-question-card stagger-item" *ngIf="currentIndex < sqSet.questions.length && isShowingFeedback">
+  <div class="explanation-box highlight">
+    <mat-icon>auto_awesome</mat-icon>
+    <p><strong>Answer:</strong> {{ sqSet.questions[currentIndex].answer }}</p>
+  </div>
+  <div class="skip-footer">
+    <button class="btn-premium skip-btn" (click)="skipToNext()">
+      <mat-icon>skip_next</mat-icon>
+      Skip & Next
     </button>
+  </div>
+</div>
+}
+
+<div class="nav-container" *ngIf="currentIndex >= sqSet.questions.length">
+  <button class="elite-next-btn btn-premium" (click)="navigateToNextPage()">
+    Complete Lesson
+    <mat-icon iconPositionEnd>arrow_forward</mat-icon>
+  </button>
+</div>
 </div>

@@ -1,40 +1,107 @@
-<div class="tf-container" *ngIf="tfSet">
-  @for (item of history; track $index) {
-    <mat-card class="history-card">
-      <mat-card-content>
-        <p><strong>Statement {{$index + 1}}:</strong> {{ item.question }}</p>
-        <p><strong>Your Answer:</strong> {{ item.userAnswer }} - {{ item.isCorrect ? '✅ Correct' : '❌ Incorrect' }}</p>
-      </mat-card-content>
-    </mat-card>
-  }
+<div class="elite-quiz-container" *ngIf="tfSet">
 
-  @if (currentIndex < tfSet.questions.length  && !isShowingFeedback) {
-    <mat-card>
-      <mat-card-title>Statement {{currentIndex + 1}}</mat-card-title>
-      <mat-card-content>
-        <p>{{ tfSet.questions[currentIndex].question }}</p>
-        <mat-radio-group [(ngModel)]="selectedOption" class="options-list">
-          <mat-radio-button value="True">True</mat-radio-button>
-          <mat-radio-button value="False">False</mat-radio-button>
-        </mat-radio-group>
-      </mat-card-content>
-      <mat-card-actions>
-        <button mat-icon-button color="primary" (click)="submitAnswerVoice()">
-          <mat-icon>mic</mat-icon>
-        </button>
-        <button mat-raised-button (click)="submitAnswer()" [disabled]="!selectedOption">Submit</button>
-      </mat-card-actions>
-    </mat-card>
-  } @else {
-    <mat-card>
-      <mat-card-content>
-        <h3>{{isShowingFeedback? "Feedback...": "Lesson Complete!" }}</h3>
-      </mat-card-content>
-    </mat-card>
-  }
+  <!-- Audio Controls + Timer -->
+  <div class="controls-bar stagger-item">
+    <div class="audio-controls">
+      <button mat-icon-button (click)="replaySpeaking()" matTooltip="Replay" class="audio-btn">
+        <mat-icon>replay</mat-icon>
+      </button>
+      <button mat-icon-button (click)="stopSpeaking()" matTooltip="Stop Speaking" class="audio-btn stop" *ngIf="isSpeaking">
+        <mat-icon>stop_circle</mat-icon>
+      </button>
+      <span class="audio-status" *ngIf="isSpeaking">
+        <span class="pulse-dot"></span>
+        Speaking...
+      </span>
+    </div>
+    <div class="timer-display" matTooltip="Elapsed time">
+      <mat-icon class="timer-icon">timer</mat-icon>
+      <span class="timer-value">{{ formattedTimer }}</span>
+    </div>
+  </div>
+
+  <!-- History / Feedback Cards -->
+  <div class="history-section" *ngIf="history.length > 0">
+    @for (item of history; track $index) {
+    <div class="feedback-card stagger-item" [class.correct]="item.isCorrect" [class.incorrect]="!item.isCorrect">
+      <div class="feedback-header">
+        <mat-icon class="status-icon">{{ item.isCorrect ? 'check_circle' : 'cancel' }}</mat-icon>
+        <span class="question-number">Statement {{$index + 1}}</span>
+      </div>
+      <p class="history-question">{{ item.question }}</p>
+
+      <div class="answer-comparison">
+        <div class="user-answer-pill" [class.correct]="item.isCorrect" [class.incorrect]="!item.isCorrect">
+          <span class="pill-label">You answered:</span>
+          <strong>{{ item.userAnswer }}</strong>
+        </div>
+      </div>
+    </div>
+    }
+  </div>
+
+  <!-- Active Question Card -->
+  @if (currentIndex < tfSet.questions.length && !isShowingFeedback) { <div class="active-question-card stagger-item">
+    <div class="question-header">
+      <span class="progress-badge">Statement {{currentIndex + 1}} of {{tfSet.questions.length}}</span>
+    </div>
+
+    <h2 class="question-text">{{ tfSet.questions[currentIndex].question }}</h2>
+
+    <div class="elite-options-grid">
+      <button class="elite-option-btn tf-true" [class.selected]="selectedOption === 'True'"
+        (click)="selectedOption = 'True'">
+        <span class="option-text">True</span>
+        <div class="radio-indicator">
+          <mat-icon *ngIf="selectedOption === 'True'">check_circle</mat-icon>
+        </div>
+      </button>
+      <button class="elite-option-btn tf-false" [class.selected]="selectedOption === 'False'"
+        (click)="selectedOption = 'False'">
+        <span class="option-text">False</span>
+        <div class="radio-indicator">
+          <mat-icon *ngIf="selectedOption === 'False'">check_circle</mat-icon>
+        </div>
+      </button>
+    </div>
+
+    <div class="action-footer">
+      @if (isListening) {
+      <div class="listen-indicator">
+        <span class="pulse-dot"></span> Listening...
+      </div>
+      }
+
+      <button class="voice-btn" mat-icon-button (click)="submitAnswerVoice()" [class.listening]="isListening"
+        matTooltip="Answer with voice">
+        <mat-icon>mic</mat-icon>
+      </button>
+      <button class="elite-submit-btn btn-premium" (click)="submitAnswer()"
+        [disabled]="!selectedOption">
+        Check Answer
+      </button>
+    </div>
 </div>
-<div class="navigation-actions">
-    <button mat-raised-button color="primary" (click)="navigateToNextPage()">
-      Next {{nextPage.replace('/lesson-', '') | titlecase}}
+} @else {
+<!-- Feedback with Skip Button -->
+<div class="active-question-card stagger-item" *ngIf="currentIndex < tfSet.questions.length && isShowingFeedback">
+  <div class="explanation-box highlight">
+    <mat-icon>auto_awesome</mat-icon>
+    <p><strong>Answer:</strong> {{ tfSet.questions[currentIndex].answer }}</p>
+  </div>
+  <div class="skip-footer">
+    <button class="btn-premium skip-btn" (click)="skipToNext()">
+      <mat-icon>skip_next</mat-icon>
+      Skip & Next
     </button>
+  </div>
+</div>
+}
+
+<div class="nav-container" *ngIf="currentIndex >= tfSet.questions.length">
+  <button class="elite-next-btn btn-premium" (click)="navigateToNextPage()">
+    Continue Practice
+    <mat-icon iconPositionEnd>arrow_forward</mat-icon>
+  </button>
+</div>
 </div>

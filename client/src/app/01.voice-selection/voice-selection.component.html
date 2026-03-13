@@ -1,44 +1,111 @@
-<div class="container">
+<div class="settings-container">
 
-  <mat-card class="voice-card">
+  <h2 class="page-title stagger-item">
+    <mat-icon class="title-icon">settings</mat-icon>
+    Voice & Speech Settings
+  </h2>
 
-    <mat-card-header>
-      <mat-card-title>Voice Settings</mat-card-title>
-      <mat-card-subtitle>Select a voice and test it</mat-card-subtitle>
-    </mat-card-header>
+  <div class="settings-grid">
 
-    <mat-card-content>
+    <!-- Voice Selection Card -->
+    <mat-card class="settings-card stagger-item">
+      <div class="card-header">
+        <div class="card-icon-wrap">
+          <mat-icon>record_voice_over</mat-icon>
+        </div>
+        <div>
+          <h3 class="card-title">Voice Selection</h3>
+          <p class="card-subtitle">Choose your preferred narrator voice</p>
+        </div>
+      </div>
 
-      <mat-form-field appearance="outline" class="full-width">
-        <mat-label>Select Voice</mat-label>
-        <mat-select [(ngModel)]="selectedVoice">
-          @for (voice of voices; track voice.name) {
-            <mat-option [value]="voice">
-              {{ voice.name }} {{ voice.default ? '(Default)' : '' }}
-            </mat-option>
+      <mat-card-content>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Select Voice</mat-label>
+          <mat-select [(ngModel)]="selectedVoice">
+            @for (voice of voices; track voice.name) {
+              <mat-option [value]="voice">
+                {{ voice.name }} {{ voice.default ? '(Default)' : '' }}
+              </mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Speech Speed Card -->
+    <mat-card class="settings-card stagger-item">
+      <div class="card-header">
+        <div class="card-icon-wrap speed-icon">
+          <mat-icon>speed</mat-icon>
+        </div>
+        <div>
+          <h3 class="card-title">Speech Speed</h3>
+          <p class="card-subtitle">Adjust how fast the explanations are read</p>
+        </div>
+      </div>
+
+      <mat-card-content>
+        <!-- Speed Presets -->
+        <div class="speed-presets">
+          @for (preset of speedPresets; track preset.value) {
+            <button class="speed-preset-btn"
+                    [class.active]="speechRate === preset.value"
+                    (click)="selectSpeedPreset(preset.value)">
+              <mat-icon>{{ preset.icon }}</mat-icon>
+              <span>{{ preset.label }}</span>
+            </button>
           }
-        </mat-select>
-      </mat-form-field>
+        </div>
 
-      <mat-form-field appearance="outline" class="full-width">
-        <mat-label>Quote</mat-label>
-        <textarea matInput rows="5" [(ngModel)]="textToRead"></textarea>
-      </mat-form-field>
+        <!-- Slider -->
+        <div class="slider-row">
+          <span class="slider-label">0.5x</span>
+          <mat-slider min="0.5" max="2" step="0.1" class="speed-slider">
+            <input matSliderThumb [ngModel]="speechRate" (ngModelChange)="onSpeedChange($event)">
+          </mat-slider>
+          <span class="slider-label">2x</span>
+        </div>
+        <div class="current-speed">
+          Current: <strong>{{ speechRate }}x</strong> · {{ getSpeedLabel() }}
+        </div>
+      </mat-card-content>
+    </mat-card>
 
-    </mat-card-content>
+    <!-- Test Voice Card -->
+    <mat-card class="settings-card test-card stagger-item">
+      <div class="card-header">
+        <div class="card-icon-wrap test-icon">
+          <mat-icon>hearing</mat-icon>
+        </div>
+        <div>
+          <h3 class="card-title">Test Your Settings</h3>
+          <p class="card-subtitle">Preview your voice and speed selection</p>
+        </div>
+      </div>
 
-    <mat-card-actions align="end">
+      <mat-card-content>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Test Text</mat-label>
+          <textarea matInput rows="3" [(ngModel)]="textToRead"></textarea>
+        </mat-form-field>
+      </mat-card-content>
 
-      <button mat-raised-button color="primary" (click)="speak()">
-        Read Quote
-      </button>
+      <mat-card-actions>
+        <button class="btn-premium test-btn" (click)="speak()" *ngIf="!isSpeaking">
+          <mat-icon>play_arrow</mat-icon>
+          Read Aloud
+        </button>
+        <button class="btn-premium stop-btn" (click)="stopSpeaking()" *ngIf="isSpeaking">
+          <mat-icon>stop</mat-icon>
+          Stop
+        </button>
+        <button class="btn-premium save-btn" (click)="navigateToLesson()">
+          <mat-icon>check</mat-icon>
+          Save & Return
+        </button>
+      </mat-card-actions>
+    </mat-card>
 
-      <button mat-raised-button color="accent" (click)="navigateToLesson()">
-        Back
-      </button>
-
-    </mat-card-actions>
-
-  </mat-card>
-
+  </div>
 </div>

@@ -19,3 +19,6 @@ scipy
 
 flask[async]
 flask-cors
+flask-limiter
+PyJWT
+bcrypt

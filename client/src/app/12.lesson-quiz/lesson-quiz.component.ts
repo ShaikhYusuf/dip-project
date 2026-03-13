@@ -1,11 +1,11 @@
 // lesson-quiz.component.ts
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, NavigationStart, Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { FormsModule } from '@angular/forms';
-import { MatRadioModule } from '@angular/material/radio';
-import { MatButtonModule} from '@angular/material/button';
+import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { AppDataService } from '../app-data.service';
 import { VoiceService } from '../voice.service';
@@ -16,40 +16,81 @@ import { AppUtilityService } from '../app.utility.service';
 @Component({
   selector: 'app-lesson-quiz',
   standalone: true,
-  imports: [CommonModule, MatIconModule, FormsModule, MatRadioModule, MatButtonModule, MatCardModule],
+  imports: [CommonModule, MatIconModule, MatTooltipModule, FormsModule, MatButtonModule, MatCardModule],
   templateUrl: './lesson-quiz.component.html',
   styleUrls: ['./lesson-quiz.component.css']
 })
-export class LessonQuizComponent implements OnInit {
-  quizSet!: IQuizSet ;
+export class LessonQuizComponent implements OnInit, OnDestroy {
+  quizSet!: IQuizSet;
   currentIndex = 0;
   selectedOption: string = '';
-  history: { question: string, answer: string, userAnswer: string, isCorrect: boolean }[] = [];
+  history: { question: string, answer: string, userAnswer: string, isCorrect: boolean, explanation: string }[] = [];
   isShowingFeedback = false;
+  isListening = false;
+  isSpeaking = false;
   nextPage: string = '/lesson-truefalse';
+
+  // Timer
+  timerSeconds = 0;
+  timerInterval: any = null;
 
   constructor(
     private router: Router,
     private route: ActivatedRoute,
-    private quizService: AppDataService, 
+    private quizService: AppDataService,
     private utilityService: AppUtilityService,
     private voiceService: VoiceService,
     private cdr: ChangeDetectorRef) {
-      this.router.events.subscribe(event => {
+    this.router.events.subscribe(event => {
       if (event instanceof NavigationStart) {
         this.voiceService.stopSpeaking();
+        this.stopTimer();
       }
     });
-    }
+  }
 
   ngOnInit() {
     const path = this.route.snapshot.queryParams['path'];
     this.nextPage = this.route.snapshot.queryParams['next'] || '/lesson-truefalse';
+
+    if (path) {
+      localStorage.setItem('lastVisitedPath', path);
+    }
+
     this.quizService.getLessonQuiz(path).subscribe((data: IQuizSet) => {
       this.quizSet = data;
       this.readCurrentQuestion();
-      this.history = []; // Clear history when loading new lesson
+      this.history = [];
+      this.startTimer();
     });
+  }
+
+  ngOnDestroy() {
+    this.voiceService.stopSpeaking();
+    this.stopTimer();
+  }
+
+  // ── Timer ──
+  startTimer() {
+    this.timerSeconds = 0;
+    this.stopTimer();
+    this.timerInterval = setInterval(() => {
+      this.timerSeconds++;
+      this.cdr.detectChanges();
+    }, 1000);
+  }
+
+  stopTimer() {
+    if (this.timerInterval) {
+      clearInterval(this.timerInterval);
+      this.timerInterval = null;
+    }
+  }
+
+  get formattedTimer(): string {
+    const mins = Math.floor(this.timerSeconds / 60);
+    const secs = this.timerSeconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   }
 
   formatQuestionForSpeech(): string {
@@ -63,80 +104,119 @@ export class LessonQuizComponent implements OnInit {
 
   readCurrentQuestion() {
     if (!this.quizSet) return;
-    this.voiceService.speak(this.formatQuestionForSpeech());
+    this.isSpeaking = true;
+    this.voiceService.speak(this.formatQuestionForSpeech(), () => {
+      this.isSpeaking = false;
+      this.cdr.detectChanges();
+    });
   }
 
   readExplanation(isRight: boolean = true) {
     if (!this.quizSet) return;
-    const text = isRight 
+    const text = isRight
       ? `That is correct. ${this.quizSet.questions[this.currentIndex].explanation}`
       : `That is incorrect. ${this.quizSet.questions[this.currentIndex].explanation}`;
-    this.voiceService.speak(text, () => this.nextQuestion());
+    this.isSpeaking = true;
+    this.cdr.detectChanges();
+    this.voiceService.speak(text, () => {
+      this.isSpeaking = false;
+      this.cdr.detectChanges();
+      this.nextQuestion();
+    });
+  }
+
+  /** Skip the spoken explanation and go straight to next question */
+  skipToNext() {
+    this.voiceService.stopSpeaking();
+    this.isSpeaking = false;
+    this.nextQuestion();
+  }
+
+  stopSpeaking() {
+    this.voiceService.stopSpeaking();
+    this.isSpeaking = false;
+    this.cdr.detectChanges();
+  }
+
+  replaySpeaking() {
+    this.voiceService.stopSpeaking();
+    if (this.isShowingFeedback) {
+      // Replay explanation
+      const item = this.history[this.history.length - 1];
+      if (item) {
+        this.isSpeaking = true;
+        this.voiceService.speak(item.explanation, () => {
+          this.isSpeaking = false;
+          this.cdr.detectChanges();
+        });
+      }
+    } else {
+      this.readCurrentQuestion();
+    }
   }
 
   submitAnswerVoice() {
+    this.isListening = true;
+    this.cdr.detectChanges();
     this.voiceService.listen((heard) => {
+      this.isListening = false;
+      this.cdr.detectChanges();
       this.processAnswer(heard);
     });
   }
 
   submitAnswer() {
     window.speechSynthesis.cancel();
-    const currentQ = this.quizSet.questions[this.currentIndex];
     this.processAnswer(this.selectedOption);
   }
 
   processAnswer(userAnswer: string) {
-
     const currentQ = this.quizSet.questions[this.currentIndex];
-    const answer = currentQ.answer.toLowerCase();
     const spoken = userAnswer.toLowerCase();
 
-    //const similarity = this.utilityService.similarity(answer, spoken);
-    this.quizService.compareTextToEmbedding(spoken, currentQ.answer_embedding!).subscribe(response => { 
+    this.quizService.compareTextToEmbedding(spoken, currentQ.answer_embedding!).subscribe(response => {
       const isCorrect = response.match;
 
-    this.isShowingFeedback = true; // Block the current card from showing inputs
-    this.cdr.detectChanges();
+      this.isShowingFeedback = true;
+      this.cdr.detectChanges();
 
-    this.history.push({
-          question: currentQ.question,
-          answer: currentQ.answer,
-          userAnswer: userAnswer,
-          isCorrect: isCorrect
-        });
+      this.history.push({
+        question: currentQ.question,
+        answer: currentQ.answer,
+        userAnswer: userAnswer,
+        isCorrect: isCorrect,
+        explanation: currentQ.explanation
+      });
 
       this.readExplanation(isCorrect);
-    })
+    });
   }
 
   nextQuestion() {
     this.currentIndex++;
     this.selectedOption = '';
-    this.isShowingFeedback = false; // Allow new card to show
+    this.isShowingFeedback = false;
     this.cdr.detectChanges();
     if (this.currentIndex < this.quizSet.questions.length) {
       this.readCurrentQuestion();
+    } else {
+      this.stopTimer();
     }
   }
 
 
-    navigateToNextPage() {
-      // count how many answers in the history were marked correct
-      const score = this.history.reduce((sum, h) => sum + (h.isCorrect ? 1 : 0), 0);
-
-      // send the score back to the data service before navigating away
-      // (adjust the method/parameters to whatever your AppDataService exposes)
-      const path = this.route.snapshot.queryParams['path'];
-      let scoreUpdate: IScoreUpdate = { quiz_score: score }
-      this.quizService.updateScores(path, scoreUpdate).subscribe(
-        () => {
-          this.router.navigate([this.nextPage], { queryParams: { path } });
-        },
-        err => {
-          console.error('unable to update quiz score', err);
-            this.router.navigate(['/']);
-        }
-      );
-    }
+  navigateToNextPage() {
+    const score = this.history.reduce((sum, h) => sum + (h.isCorrect ? 1 : 0), 0);
+    const path = this.route.snapshot.queryParams['path'];
+    let scoreUpdate: IScoreUpdate = { quiz_score: score };
+    this.quizService.updateScores(path, scoreUpdate).subscribe(
+      () => {
+        this.router.navigate([this.nextPage], { queryParams: { path } });
+      },
+      err => {
+        console.error('unable to update quiz score', err);
+        this.router.navigate(['/']);
+      }
+    );
+  }
 }

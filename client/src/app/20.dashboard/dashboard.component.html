@@ -1,0 +1,173 @@
+<div class="dashboard-container">
+
+  <!-- ============ HERO HEADER ============ -->
+  <div class="dash-hero stagger-item">
+    <div class="hero-text">
+      <h1 class="hero-title">{{ greeting }}, Learner! 👋</h1>
+      <p class="hero-subtitle">Track your progress and keep the momentum going.</p>
+    </div>
+
+    <!-- Resume Button -->
+    <button *ngIf="lastVisitedPath" class="resume-btn btn-premium" (click)="resumeLastLesson()">
+      <mat-icon>play_arrow</mat-icon>
+      Resume Last Lesson
+    </button>
+  </div>
+
+  <!-- ============ OVERVIEW CARDS ============ -->
+  <div class="overview-row">
+
+    <mat-card class="stat-card stagger-item glass-panel">
+      <div class="stat-icon-wrap accent-glow">
+        <mat-icon>school</mat-icon>
+      </div>
+      <div class="stat-body">
+        <span class="stat-value">{{ totalSections }}</span>
+        <span class="stat-label">Total Sections</span>
+      </div>
+    </mat-card>
+
+    <mat-card class="stat-card stagger-item glass-panel">
+      <div class="stat-icon-wrap success-glow">
+        <mat-icon>check_circle</mat-icon>
+      </div>
+      <div class="stat-body">
+        <span class="stat-value">{{ completedSections }}</span>
+        <span class="stat-label">Completed</span>
+      </div>
+    </mat-card>
+
+    <mat-card class="stat-card stagger-item glass-panel">
+      <div class="stat-icon-wrap primary-glow">
+        <mat-icon>trending_up</mat-icon>
+      </div>
+      <div class="stat-body">
+        <span class="stat-value" [class]="'progress-' + getProgressColor(overallProgress)">{{ overallProgress }}%</span>
+        <span class="stat-label">Overall Progress</span>
+      </div>
+    </mat-card>
+
+  </div>
+
+  <!-- ============ CHARTS ============ -->
+  <div class="charts-row" *ngIf="chartsReady">
+    <mat-card class="chart-card stagger-item glass-panel">
+      <h3 class="chart-title">
+        <mat-icon class="chart-icon">donut_large</mat-icon>
+        Overall Progress
+      </h3>
+      <div class="chart-center-wrap">
+        <canvas #progressChart width="200" height="200"></canvas>
+        <div class="chart-center-label">
+          <span class="center-value" [class]="'progress-' + getProgressColor(overallProgress)">{{ overallProgress }}%</span>
+          <span class="center-sub">Complete</span>
+        </div>
+      </div>
+    </mat-card>
+
+    <mat-card class="chart-card score-chart-card stagger-item glass-panel">
+      <h3 class="chart-title">
+        <mat-icon class="chart-icon">bar_chart</mat-icon>
+        Score Breakdown
+      </h3>
+      <div class="bar-chart-wrap">
+        <canvas #scoreChart></canvas>
+      </div>
+    </mat-card>
+  </div>
+
+  <!-- ============ TOPIC PROGRESS ============ -->
+  <h2 class="section-title stagger-item">
+    <mat-icon class="section-icon">insights</mat-icon>
+    Topic Progress
+  </h2>
+
+  <div class="topic-grid">
+    @for (topic of topics; track topic.path) {
+      <mat-card class="topic-card stagger-item">
+
+        <mat-card-header>
+          <div class="topic-header-row">
+            <div>
+              <mat-card-title class="topic-title">{{ topic.title }}</mat-card-title>
+              <mat-card-subtitle class="topic-subtitle">
+                {{ topic.completedSections }} / {{ topic.totalSections }} sections completed
+              </mat-card-subtitle>
+            </div>
+            <span *ngIf="isCompleted(topic.progressPercent)" class="completed-badge">
+              <mat-icon style="font-size:16px;width:16px;height:16px;">verified</mat-icon>
+              Completed
+            </span>
+          </div>
+        </mat-card-header>
+
+        <mat-card-content>
+          <!-- Progress Bar with Color -->
+          <mat-progress-bar
+            mode="determinate"
+            [value]="topic.progressPercent"
+            [class]="getProgressBarClass(topic.progressPercent)">
+          </mat-progress-bar>
+          <span class="progress-label" [class]="'progress-' + getProgressColor(topic.progressPercent)">
+            {{ topic.progressPercent }}%
+          </span>
+
+          <!-- Score chips -->
+          <div class="score-chips">
+            <mat-chip-set>
+              <mat-chip>🧠 Quiz Avg: {{ topic.avgQuiz }}</mat-chip>
+              <mat-chip>✅ T/F Avg: {{ topic.avgTrueFalse }}</mat-chip>
+              <mat-chip>✍️ Short Q Avg: {{ topic.avgShortQ }}</mat-chip>
+            </mat-chip-set>
+          </div>
+
+          <!-- Lesson details -->
+          @for (lesson of topic.lessons; track lesson.path) {
+            <div class="lesson-row">
+              <span class="lesson-title">{{ lesson.title }}</span>
+              <mat-progress-bar
+                class="lesson-bar"
+                mode="determinate"
+                [value]="lesson.avgScore"
+                [class]="getProgressBarClass(lesson.avgScore)">
+              </mat-progress-bar>
+              <span class="lesson-pct" [class]="'progress-' + getProgressColor(lesson.avgScore)">{{ lesson.avgScore }}%</span>
+              <mat-icon *ngIf="isCompleted(lesson.avgScore)" class="lesson-check" matTooltip="Completed!">check_circle</mat-icon>
+            </div>
+          }
+        </mat-card-content>
+      </mat-card>
+    }
+  </div>
+
+  <!-- ============ RECENT ACTIVITY ============ -->
+  @if (recentSections.length > 0) {
+    <h2 class="section-title stagger-item">
+      <mat-icon class="section-icon">history</mat-icon>
+      Recent Activity
+    </h2>
+    <div class="recent-list">
+      @for (sec of recentSections; track sec.path) {
+        <mat-card class="recent-card stagger-item" (click)="openLesson(sec.path)">
+          <div class="recent-play-icon">
+            <mat-icon>play_circle</mat-icon>
+          </div>
+          <div class="recent-info">
+            <span class="recent-path">{{ sec.path }}</span>
+            <span class="recent-score">Score: {{ sec.score }}</span>
+          </div>
+          <mat-icon class="arrow">chevron_right</mat-icon>
+        </mat-card>
+      }
+    </div>
+  }
+
+  <!-- ============ CTA ============ -->
+  <div class="cta-row stagger-item">
+    <button class="btn-premium cta-btn" (click)="openTopics()">
+      <mat-icon>menu_book</mat-icon>
+      Browse All Topics
+    </button>
+  </div>
+
+</div>

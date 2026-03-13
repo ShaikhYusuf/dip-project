@@ -1,38 +1,125 @@
+/* ═══════════════ Lesson Hierarchy — Premium Styling ═══════════════ */
+
 .container {
   max-width: 900px;
   margin: auto;
-  padding: 20px;
+  padding: 8px 0;
 }
 
-.title {
-  margin-bottom: 20px;
-  font-weight: 600;
+.page-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.5rem;
+  font-weight: 800;
+  margin-bottom: 24px;
+  color: var(--text-color);
 }
 
+.page-title .title-icon {
+  color: var(--primary-color);
+  font-size: 28px;
+  width: 28px;
+  height: 28px;
+}
+
+/* ── Panels ── */
+.topic-panel {
+  border-radius: 16px !important;
+  margin-bottom: 12px !important;
+  overflow: hidden;
+  background: var(--card-bg) !important;
+  backdrop-filter: blur(var(--glass-blur)) !important;
+  -webkit-backdrop-filter: blur(var(--glass-blur)) !important;
+  border: 1px solid var(--card-border) !important;
+  box-shadow: var(--card-shadow) !important;
+}
+
+.lesson-panel {
+  border-radius: 12px !important;
+  margin-bottom: 8px !important;
+  background: var(--hover-bg) !important;
+}
+
+.panel-title {
+  font-weight: 700 !important;
+  font-size: 1.1rem !important;
+  color: var(--text-color) !important;
+}
+
+.lesson-panel-title {
+  font-weight: 600 !important;
+  font-size: 0.95rem !important;
+  color: var(--text-color) !important;
+}
+
+/* ── Section Cards ── */
 .section-card {
   display: flex;
   justify-content: space-between;
   align-items: center;
-
-  padding: 12px;
+  padding: 16px;
   margin-bottom: 10px;
+  border-radius: 14px;
+  border: 1px solid var(--border-color);
+  background: var(--card-bg);
+  backdrop-filter: blur(10px);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
 
-  border-radius: 8px;
-  border: 1px solid #ddd;
-
-  background: #fafafa;
+.section-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--card-hover-shadow);
 }
 
 .section-info {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
+  flex: 1;
+}
+
+.section-path-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .section-path {
-  font-weight: 500;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--text-color);
 }
 
 mat-chip {
-  margin-right: 6px;
+  cursor: pointer !important;
+  transition: transform 0.15s ease !important;
+  font-size: 0.78rem !important;
+}
+
+mat-chip:hover {
+  transform: scale(1.04);
+}
+
+.score-high {
+  background: rgba(16, 185, 129, 0.15) !important;
+  color: var(--success-color) !important;
+}
+
+.score-mid {
+  background: rgba(245, 158, 11, 0.15) !important;
+  color: var(--warning-color) !important;
+}
+
+.score-low {
+  background: rgba(239, 68, 68, 0.1) !important;
+  color: var(--danger-color) !important;
+}
+
+.start-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  margin-left: 16px;
 }

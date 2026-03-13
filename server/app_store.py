@@ -6,14 +6,14 @@ import sys
 from langchain_ollama import OllamaLLM
 
 
-from lib.x0_data_ingestor import DataIngestor
-from lib.x0_utility import Utility
-from lib.x10_lesson_store import MyLessonStore
-from lib.x11_lesson_content import MyLessonContent
-from lib.x12_lesson_match_column import MyLessonMatchColumn
-from lib.x13_lesson_quiz import MyLessonQuiz
-from lib.x14_lesson_short_question import MyLessonShortQuestion
-from lib.x15_lesson_truefalse import MyLessonTrueFalse
+from lib.data_ingestor import DataIngestor
+from lib.utility import Utility
+from lib.lesson_store import MyLessonStore
+from lib.lesson_content import MyLessonContent
+from lib.lesson_match_column import MyLessonMatchColumn
+from lib.lesson_quiz import MyLessonQuiz
+from lib.lesson_short_question import MyLessonShortQuestion
+from lib.lesson_truefalse import MyLessonTrueFalse
 
 # Global variable to hold the ingestor for cleanup
 _ingestor = None

@@ -1,25 +1,201 @@
-.container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 40px;
+/* ═══════════════ Settings — Premium Styling ═══════════════ */
+
+.settings-container {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 8px 0;
 }
 
-.voice-card {
-  width: 500px;
-  padding: 10px;
+.page-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.5rem;
+  font-weight: 800;
+  margin-bottom: 28px;
+  color: var(--text-color);
+}
+
+.page-title .title-icon {
+  color: var(--primary-color);
+  font-size: 28px;
+  width: 28px;
+  height: 28px;
+}
+
+/* ── Settings Grid ── */
+.settings-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.settings-card {
+  padding: 28px !important;
+  border-radius: 20px !important;
+}
+
+/* ── Card Header ── */
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.card-icon-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-dark, #4f46e5));
+  box-shadow: 0 4px 15px var(--glow-primary);
+  flex-shrink: 0;
+}
+
+.card-icon-wrap mat-icon {
+  color: #fff;
+  font-size: 24px;
+  width: 24px;
+  height: 24px;
+}
+
+.card-icon-wrap.speed-icon {
+  background: linear-gradient(135deg, #f59e0b, #f97316);
+  box-shadow: 0 4px 15px rgba(245, 158, 11, 0.35);
+}
+
+.card-icon-wrap.test-icon {
+  background: linear-gradient(135deg, #10b981, #059669);
+  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.35);
+}
+
+.card-title {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-color);
+}
+
+.card-subtitle {
+  margin: 4px 0 0;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
 }
 
 .full-width {
   width: 100%;
-  margin-bottom: 16px;
 }
 
-mat-card-title {
-  font-size: 22px;
+/* ── Speed Presets ── */
+.speed-presets {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.speed-preset-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 14px 8px;
+  border: 2px solid var(--border-color);
+  border-radius: 14px;
+  background: var(--card-bg);
+  cursor: pointer;
+  transition: all 0.25s ease;
+  color: var(--text-secondary);
+  font-size: 0.78rem;
   font-weight: 600;
 }
 
-mat-card-subtitle {
-  font-size: 14px;
+.speed-preset-btn:hover {
+  border-color: var(--primary-light, #a5b4fc);
+  transform: translateY(-2px);
+  color: var(--primary-color);
+}
+
+.speed-preset-btn.active {
+  border-color: var(--primary-color);
+  background: rgba(99, 102, 241, 0.08);
+  color: var(--primary-color);
+  box-shadow: 0 4px 15px var(--glow-primary);
+}
+
+.speed-preset-btn mat-icon {
+  font-size: 22px;
+  width: 22px;
+  height: 22px;
+}
+
+/* ── Slider ── */
+.slider-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.slider-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.speed-slider {
+  flex: 1;
+}
+
+.current-speed {
+  text-align: center;
+  margin-top: 12px;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.current-speed strong {
+  color: var(--primary-color);
+  font-size: 1.1rem;
+}
+
+/* ── Action Buttons ── */
+mat-card-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 0 !important;
+  margin-top: 16px !important;
+}
+
+.test-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.stop-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+  box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3) !important;
+}
+
+.save-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(135deg, #10b981, #059669) !important;
+  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3) !important;
+}
+
+/* ── Responsive ── */
+@media (max-width: 500px) {
+  .speed-presets {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }

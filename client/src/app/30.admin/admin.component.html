@@ -1,0 +1,94 @@
+<div class="admin-container">
+
+  <h2 class="page-title stagger-item">
+    <mat-icon class="title-icon">admin_panel_settings</mat-icon>
+    Admin Panel
+  </h2>
+
+  <!-- Tabs -->
+  <div class="tab-bar stagger-item">
+    <button class="tab-btn" [class.active]="activeTab === 'users'" (click)="switchTab('users')">
+      <mat-icon>people</mat-icon> Users
+    </button>
+    <button class="tab-btn" [class.active]="activeTab === 'lessons'" (click)="switchTab('lessons')">
+      <mat-icon>menu_book</mat-icon> Lessons CMS
+    </button>
+  </div>
+
+  <!-- Message Banner -->
+  <div class="message-banner stagger-item" *ngIf="message">
+    <mat-icon>info</mat-icon>
+    {{ message }}
+    <button mat-icon-button (click)="message = ''"><mat-icon>close</mat-icon></button>
+  </div>
+
+  <!-- ═══ USERS TAB ═══ -->
+  <div *ngIf="activeTab === 'users'" class="tab-content">
+    <mat-card class="admin-table-card stagger-item" *ngFor="let user of users">
+      <div class="user-row">
+        <div class="user-avatar">
+          <mat-icon>account_circle</mat-icon>
+        </div>
+        <div class="user-info">
+          <span class="user-name">{{ user.name }}</span>
+          <span class="user-email">{{ user.email }}</span>
+        </div>
+        <mat-chip-set>
+          <mat-chip [class]="user.role === 'admin' ? 'chip-admin' : 'chip-student'">
+            {{ user.role }}
+          </mat-chip>
+        </mat-chip-set>
+        <div class="user-actions">
+          <button mat-icon-button matTooltip="Make Admin" *ngIf="user.role !== 'admin'" (click)="updateRole(user, 'admin')">
+            <mat-icon>shield</mat-icon>
+          </button>
+          <button mat-icon-button matTooltip="Make Student" *ngIf="user.role === 'admin'" (click)="updateRole(user, 'student')">
+            <mat-icon>person</mat-icon>
+          </button>
+          <button mat-icon-button matTooltip="Delete User" class="delete-btn" (click)="deleteUser(user)">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </div>
+      </div>
+    </mat-card>
+
+    <div class="empty-state" *ngIf="users.length === 0 && !loading">
+      <mat-icon>group_off</mat-icon>
+      <p>No users found</p>
+    </div>
+  </div>
+
+  <!-- ═══ LESSONS TAB ═══ -->
+  <div *ngIf="activeTab === 'lessons'" class="tab-content">
+    @for (topic of getTopics(); track topic.path) {
+      <mat-card class="lesson-cms-card stagger-item">
+        <h3 class="cms-topic-title">
+          <mat-icon>folder</mat-icon>
+          {{ topic.title }}
+        </h3>
+
+        @for (lesson of getLessonsForTopic(topic.path); track lesson.path) {
+          <div class="cms-lesson-block">
+            <span class="cms-lesson-title">{{ lesson.title }}</span>
+            <div class="section-list">
+              @for (section of lesson.sections; track section.path) {
+                <div class="section-row">
+                  <span class="section-path">{{ section.path }}</span>
+                  <div class="section-scores">
+                    <span>Q: {{ section.quiz_score }}</span>
+                    <span>T/F: {{ section.truefalse_score }}</span>
+                    <span>SQ: {{ section.shortquestion_score }}</span>
+                  </div>
+                  <button mat-icon-button matTooltip="Reset Scores" class="reset-btn" (click)="resetScores(section.path)">
+                    <mat-icon>restart_alt</mat-icon>
+                  </button>
+                </div>
+              }
+            </div>
+          </div>
+        }
+      </mat-card>
+    }
+  </div>
+
+</div>

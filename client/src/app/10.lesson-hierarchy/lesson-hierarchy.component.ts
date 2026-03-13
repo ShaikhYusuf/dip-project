@@ -8,7 +8,7 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
 
 import { Router } from '@angular/router';
-import { ILessonHierarchy } from '../app.model';
+import { ILessonHierarchy, ISectionScore } from '../app.model';
 import { AppDataService } from '../app-data.service';
 import { VoiceService } from '../voice.service';
 
@@ -61,16 +61,29 @@ export class LessonHierarchyComponent implements OnInit {
     return this.lessons.filter(l => l.parent_path === topicPath);
   }
 
+  /** Check if a section has any scores (i.e. completed) */
+  isSectionCompleted(section: ISectionScore): boolean {
+    return section.quiz_score > 0 && section.truefalse_score > 0 && section.shortquestion_score > 0;
+  }
+
+  /** Returns a CSS class based on score value (out of 5) */
+  getScoreClass(score: number): string {
+    if (score >= 5) return 'score-high';
+    if (score >= 2) return 'score-mid';
+    return 'score-low';
+  }
+
   openLesson(path: string) {
+    localStorage.setItem('lastVisitedPath', path);
     this.router.navigate(['/lesson-content'], {
       queryParams: { path: path, next: "/lesson-quiz" }
     });
   }
 
   openRoute(path: string, currentRoute: string) {
+    localStorage.setItem('lastVisitedPath', path);
     this.router.navigate([currentRoute], {
       queryParams: { path: path, next: "/lesson-hierarchy" }
     });
   }
-
 }

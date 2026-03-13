@@ -1,3 +1,15 @@
+# Server Installation
+## Create environment and activate it
+python -m venv .env
+source ./.env/Scripts/activate
+
+## upgrade pip and install dependencies
+python -m pip install --upgrade pip
+pip install -r requirements.txt
+
+## start server
+python app.py
+
 # Server Maintenance
 
 ### Taking the backup of the server

@@ -1,14 +1,17 @@
 <div class="container">
 
-  <h2 class="title">Learning Topics</h2>
+  <h2 class="page-title stagger-item">
+    <mat-icon class="title-icon">menu_book</mat-icon>
+    Learning Topics
+  </h2>
 
   <mat-accordion multi>
 
     <!-- Topics -->
-    <mat-expansion-panel *ngFor="let topic of topics; let i = index" [expanded]="i === 0">
+    <mat-expansion-panel *ngFor="let topic of topics; let i = index" [expanded]="i === 0" class="topic-panel stagger-item">
 
       <mat-expansion-panel-header>
-        <mat-panel-title>
+        <mat-panel-title class="panel-title">
           {{topic.title}}
         </mat-panel-title>
       </mat-expansion-panel-header>
@@ -16,10 +19,10 @@
       <!-- Lessons -->
       <mat-accordion multi>
 
-        <mat-expansion-panel *ngFor="let lesson of getLessons(topic.path); let i = index" [expanded]="i === 0">
+        <mat-expansion-panel *ngFor="let lesson of getLessons(topic.path); let i = index" [expanded]="i === 0" class="lesson-panel">
 
           <mat-expansion-panel-header>
-            <mat-panel-title>
+            <mat-panel-title class="lesson-panel-title">
               {{lesson.title}}
             </mat-panel-title>
           </mat-expansion-panel-header>
@@ -30,32 +33,39 @@
 
             <div class="section-info">
 
-              <div class="section-path">
-                {{section.path}}
+              <div class="section-path-row">
+                <span class="section-path">{{section.path}}</span>
+                <span *ngIf="isSectionCompleted(section)" class="completed-badge">
+                  <mat-icon style="font-size:14px;width:14px;height:14px;">check_circle</mat-icon>
+                  Done
+                </span>
               </div>
 
               <mat-chip-set>
 
-                <mat-chip (click)="openRoute(section.path, '/lesson-quiz')">
-                  Quiz: {{section.quiz_score}}
+                <mat-chip (click)="openRoute(section.path, '/lesson-quiz')"
+                          [class]="getScoreClass(section.quiz_score)">
+                  🧠 Quiz: {{section.quiz_score}}
                 </mat-chip>
 
-                <mat-chip (click)="openRoute(section.path, '/lesson-truefalse')">
-                  True/False: {{section.truefalse_score}}
+                <mat-chip (click)="openRoute(section.path, '/lesson-truefalse')"
+                          [class]="getScoreClass(section.truefalse_score)">
+                  ✅ T/F: {{section.truefalse_score}}
                 </mat-chip>
 
-                <mat-chip (click)="openRoute(section.path, '/lesson-shortquestion')">
-                  Short Q: {{section.shortquestion_score}}
+                <mat-chip (click)="openRoute(section.path, '/lesson-shortquestion')"
+                          [class]="getScoreClass(section.shortquestion_score)">
+                  ✍️ Short Q: {{section.shortquestion_score}}
                 </mat-chip>
 
               </mat-chip-set>
 
             </div>
 
-            <button mat-raised-button
-                    color="primary"
+            <button class="btn-premium start-btn"
                     (click)="openLesson(section.path)">
-              Start Lesson
+              <mat-icon>play_arrow</mat-icon>
+              Start
             </button>
 
           </div>

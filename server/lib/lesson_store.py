@@ -3,11 +3,11 @@ import json
 from pydantic import BaseModel
 from typing import List, Optional
 
-from lib.x11_lesson_content import MyLessonContent
-from lib.x12_lesson_match_column import MyLessonMatchColumn
-from lib.x13_lesson_quiz import MyLessonQuiz
-from lib.x14_lesson_short_question import MyLessonShortQuestion
-from lib.x15_lesson_truefalse import MyLessonTrueFalse
+from lib.lesson_content import MyLessonContent
+from lib.lesson_match_column import MyLessonMatchColumn
+from lib.lesson_quiz import MyLessonQuiz
+from lib.lesson_short_question import MyLessonShortQuestion
+from lib.lesson_truefalse import MyLessonTrueFalse
 
 # ------------------- Data Models ------------------ #
 
@@ -429,4 +429,22 @@ class MyLessonStore():
         except Exception as e:
             cls.conn.rollback()
             print("Error updating short‑question score:", e)
+            return False
+
+    @classmethod
+    def update_section_content(cls, path: str, content: str) -> bool:
+        """Update the content of a lesson section (admin CMS)."""
+        query = f"""
+        UPDATE {cls.table_sections}
+        SET content = %s
+        WHERE path = %s
+        """
+        try:
+            with cls.conn.cursor() as cur:
+                cur.execute(query, (content, path))
+            cls.conn.commit()
+            return cur.rowcount > 0 if hasattr(cur, 'rowcount') else True
+        except Exception as e:
+            cls.conn.rollback()
+            print("Error updating section content:", e)
             return False
